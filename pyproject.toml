@@ -1,0 +1,15 @@
+[project]
+name = "sage_utils"
+description = "My own personal collection of utility nodes. Everyone else seems to have one, so why not me as well?"
+version = "0.0.1"
+license = { file = "LICENSE" }
+dependencies = []
+
+[project.urls]
+Repository = ""
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = "arcum42"
+DisplayName = "Sage Utils"
+Icon = ""
