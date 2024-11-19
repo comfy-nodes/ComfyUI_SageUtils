@@ -13,6 +13,7 @@ from PIL.PngImagePlugin import PngInfo
 import comfy
 import folder_paths
 import cli_args
+import nodes
         
 def lora_to_string(lora_name, model_weight, clip_weight):
     lora_string = ' <lora:' + str(pathlib.Path(lora_name).name) + ":" + str(model_weight) + ":"  + str(clip_weight) +  ">"
@@ -27,6 +28,63 @@ def lora_stack_to_string(stack):
         
     return lora_string
 
+class Sage_SamplerInfo:
+    def __init__(self):
+        pass
+    
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "tooltip": "The random seed used for creating the noise."}),
+                "steps": ("INT", {"default": 20, "min": 1, "max": 10000, "tooltip": "The number of steps used in the denoising process."}),
+                "cfg": ("FLOAT", {"default": 5.5, "min": 0.0, "max": 100.0, "step":0.1, "round": 0.01, "tooltip": "The Classifier-Free Guidance scale balances creativity and adherence to the prompt. Higher values result in images more closely matching the prompt however too high values will negatively impact quality."}),
+                "sampler_name": (comfy.samplers.KSampler.SAMPLERS, {"default": "dpmpp_2m", "tooltip": "The algorithm used when sampling, this can affect the quality, speed, and style of the generated output."}),
+                "scheduler": (comfy.samplers.KSampler.SCHEDULERS, {"default": "beta", "tooltip": "The scheduler controls how noise is gradually removed to form the image."}),
+            }
+        }
+
+    RETURN_TYPES = ("SAMPLER_INFO",)
+    OUTPUT_TOOLTIPS = ("To be piped to the Construct Metadata node.",)
+    FUNCTION = "pass_info"
+
+    CATEGORY = "Sage Utils"
+    DESCRIPTION = "Grabs most of the sampler info and passes it along."
+
+    def pass_info(self, seed, steps, cfg, sampler_name, scheduler):
+        s_info = {}
+        s_info["seed"] = seed
+        s_info["steps"] = steps
+        s_info["cfg"] = cfg
+        s_info["sampler"] = sampler_name
+        s_info["scheduler"] = scheduler
+        return s_info,
+
+class Sage_KSampler:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "model": ("MODEL", {"tooltip": "The model used for denoising the input latent."}),
+                "sampler_info": ('SAMPLER_INFO', { "defaultInput": True}),
+                "positive": ("CONDITIONING", {"tooltip": "The conditioning describing the attributes you want to include in the image."}),
+                "negative": ("CONDITIONING", {"tooltip": "The conditioning describing the attributes you want to exclude from the image."}),
+                "latent_image": ("LATENT", {"tooltip": "The latent image to denoise."}),
+                "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "The amount of denoising applied, lower values will maintain the structure of the initial image allowing for image to image sampling."}),
+            }
+        }
+
+    RETURN_TYPES = ("LATENT",)
+    OUTPUT_TOOLTIPS = ("The denoised latent.",)
+    FUNCTION = "sample"
+
+    CATEGORY = "Sage Utils"
+    DESCRIPTION = "Uses the provided model, positive and negative conditioning to denoise the latent image."
+
+    def sample(self, model, sampler_info, positive, negative, latent_image, denoise=1.0):
+        return nodes.common_ksampler(model, sampler_info["seed"], sampler_info["steps"], sampler_info["cfg"], sampler_info["sampler"], sampler_info["scheduler"], positive, negative, latent_image, denoise=denoise)
+
+  
 class Sage_ConstructMetadata:
     def __init__(self):
         pass
@@ -37,7 +95,10 @@ class Sage_ConstructMetadata:
             "required": { 
                 "model_info": ('MODEL_INFO',{ "defaultInput": True}),
                 "positive_string": ('STRING',{ "defaultInput": True}),
-                "negative_string": ('STRING',{ "defaultInput": True})
+                "negative_string": ('STRING',{ "defaultInput": True}),
+                "sampler_info": ('SAMPLER_INFO', { "defaultInput": True}),
+                "width": ('INT', { "defaultInput": True}),
+                "height": ('INT', { "defaultInput": True})
             },
             "optional": {
                 "lora_stack": ('LORA_STACK',{ "defaultInput": True})
@@ -51,7 +112,7 @@ class Sage_ConstructMetadata:
     CATEGORY = "Sage Utils"
     DESCRIPTION = "Puts together metadata from data provided by other nodes in Sage Utils."
     
-    def construct_metadata(self, model_info, positive_string, negative_string, lora_stack = None):
+    def construct_metadata(self, model_info, positive_string, negative_string, width, height, sampler_info, lora_stack = None):
         metadata = ''
         lora_info = ''
         resource_hashes = {}
@@ -62,7 +123,9 @@ class Sage_ConstructMetadata:
         
         resource_hashes['model'] = model_info['hash']
         
-        metadata = f"Positive Prompt: {positive_string} {lora_info} Negative prompt: {negative_string}" + "\n" 
+        metadata = f"{positive_string} {lora_info}" + "\n" 
+        metadata += f"Negative prompt: {negative_string}" + "\n"
+        metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_info['sampler']}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height},"
         metadata += f"Model: {model_info['name']},Model hash: {model_info['hash']},  Version: v1.10-RC-6-actually-totally-comfyui, Hashes: {json.dumps(resource_hashes)}"
         print(metadata)
         return metadata,
@@ -79,7 +142,7 @@ class Sage_CheckpointLoaderSimple:
             }
         }
     RETURN_TYPES = ("MODEL", "CLIP", "VAE", "MODEL_INFO", )
-    RETURN_NAMES = ("model", "clip", "vae", "MODEL_INFO")
+    RETURN_NAMES = ("model", "clip", "vae", "model_info")
     OUTPUT_TOOLTIPS = ("The model used for denoising latents.", 
                        "The CLIP model used for encoding text prompts.", 
                        "The VAE model used for encoding and decoding images to and from latent space.",
@@ -140,7 +203,6 @@ class Sage_ExamineNode:
             }
  
     RETURN_TYPES  = ('STRING',)
-    #RETURN_NAMES  = ()
  
     FUNCTION  =  "test"
     OUTPUT_NODE   = False
@@ -210,7 +272,7 @@ class Sage_SaveImageWithMetadata:
         return {
             "required": {
                 "images": ("IMAGE", {"tooltip": "The images to save."}),
-                "filename_prefix": ("STRING", {"default": "ComfyUI", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or %Empty Latent Image.width% to include values from nodes."})
+                "filename_prefix": ("STRING", {"default": "ComfyUI_Meta", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or %Empty Latent Image.width% to include values from nodes."})
             },
             "optional": {
                 "param_metadata": ("STRING",{ "defaultInput": True}),
@@ -274,6 +336,8 @@ NODE_CLASS_MAPPINGS = {
     #"Sage_MultiModelNameChooser": Sage_MultiModelNameChooser,
     "Sage_LoraStackToString": Sage_LoraStackToString,
     "Sage_LoraNameToString": Sage_LoraNameToString,
+    "Sage_SamplerInfo": Sage_SamplerInfo,
+    "Sage_KSampler": Sage_KSampler,
     "Sage_ConstructMetadata": Sage_ConstructMetadata,
     "Sage_CheckpointLoaderSimple": Sage_CheckpointLoaderSimple,
     "Sage_SaveImageWithMetadata": Sage_SaveImageWithMetadata
@@ -285,6 +349,8 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     #"Sage_MultiModelNameChooser": "Multi Model Name Chooser",
     "Sage_LoraStackToString":   "Lora Stack to String",
     "Sage_LoraNameToString":  "Lora Name to String",
+    "Sage_SamplerInfo": "Sampler Info",
+    "Sage_KSampler": "KSampler w/ Sampler Info",
     "Sage_ConstructMetadata": "Construct Metadata",
     "Sage_CheckpointLoaderSimple": "Load Checkpoint With Name",
     "Sage_SaveImageWithMetadata": "Save Image with Added Metadata"
