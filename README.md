@@ -1,5 +1,5 @@
-If you are reading this, feel free to open an issue, as I should update this before changing this from private to public.
+This is the Sage Utils set of custom nodes. Everyone seems to be making their own suites of nodes, and I decided I'd go ahead and make one myself, for any nodes I feel would be helpful.
 
-This is the Sage Utils set of custom nodes. Basically just where I'm going to be sticking all the nodes that I create for the moment.
+I've started with a bunch of metadata nodes. There are several other node sets out there for adding metadata for interoperability with Civitai, but I wasn't happy with them and decided to try spinning my own, though I definitely looked at ImageSaver and other places.
 
-I intend to make some nodes to help with managing metadata, first of all, as I'mn not really happy with the existing ones I've found. I'd also like to have some nodes for working with Civitai, and possibly image websites apis.
+Anything dealing with Lora Stacks is intended to be interoperable with other custom nodes that use those, though I'm also spinning my own versions of a few nodes so that you don't need to use other sets nodes with mine.

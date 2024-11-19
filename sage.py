@@ -28,6 +28,43 @@ def lora_stack_to_string(stack):
         
     return lora_string
 
+def get_file_sha256(path):
+    m = hashlib.sha256()
+    with open(path, 'rb') as f:
+        m.update(f.read())
+    result = str(m.digest().hex()[:10])
+    return result
+
+class Sage_DualCLIPTextEncode:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "clip": ("CLIP", {"defaultInput": True, "tooltip": "The CLIP model used for encoding the text."}),
+                "pos": ("STRING", {"defaultInput": True, "default": "score_9, score_8_up, scoure_7_up, score_6_up, score_5_up, score_4_up", "multiline": True, "dynamicPrompts": True, "tooltip": "The positive prompt's text."}), 
+                "neg": ("STRING", {"defaultInput": True, "default": "signature, watermark", "multiline": True, "dynamicPrompts": True, "tooltip": "The negative prompt's text."})
+            }
+        }
+    RETURN_TYPES = ("CONDITIONING", "CONDITIONING", "STRING", "STRING")
+    RETURN_NAMES = ("pos_cond", "neg_cond", "pos_text", "neg_text")
+    
+    OUTPUT_TOOLTIPS = ("A conditioning containing the embedded text used to guide the diffusion model.",)
+    FUNCTION = "encode"
+
+    CATEGORY = "Sage Utils"
+    DESCRIPTION = "Turns a positive and negative prompt into to conditionings, to save space."
+
+    def encode(self, clip, pos, neg):
+        pos_tokens = clip.tokenize(pos)
+        pos_output = clip.encode_from_tokens(pos_tokens, return_pooled=True, return_dict=True)
+        pos_cond = pos_output.pop("cond")
+        
+        neg_tokens = clip.tokenize(neg)
+        neg_output = clip.encode_from_tokens(neg_tokens, return_pooled=True, return_dict=True)
+        neg_cond = neg_output.pop("cond")
+        
+        return ([[pos_cond, pos_output]], [[neg_cond, neg_output]], pos, neg)
+
 class Sage_SamplerInfo:
     def __init__(self):
         pass
@@ -84,7 +121,36 @@ class Sage_KSampler:
     def sample(self, model, sampler_info, positive, negative, latent_image, denoise=1.0):
         return nodes.common_ksampler(model, sampler_info["seed"], sampler_info["steps"], sampler_info["cfg"], sampler_info["sampler"], sampler_info["scheduler"], positive, negative, latent_image, denoise=denoise)
 
-  
+def civitai_sampler_name(sampler_name, scheduler_name):
+    comfy_to_auto = {
+        'ddim': 'DDIM',
+        'dpm_2': 'DPM2',
+        'dpm_2_ancestral': 'DPM2 a',
+        'dpmpp_2s_ancestral': 'DPM++ 2S a',
+        'dpmpp_2m': 'DPM++ 2M',
+        'dpmpp_sde': 'DPM++ SDE',
+        'dpmpp_2m_sde': 'DPM++ 2M SDE',
+        'dpmpp_3m_sde': 'DPM++ 3M SDE',
+        'dpm_fast': 'DPM fast',
+        'dpm_adaptive': 'DPM adaptive',
+        'euler_ancestral': 'Euler a',
+        'euler': 'Euler',
+        'heun': 'Heun',
+        'lcm': 'LCM',
+        'lms': 'LMS',
+        'plms': 'PLMS',
+        'uni_pc': 'UniPC',
+        'uni_pc_bh2': 'UniPC'
+    }
+    result = comfy_to_auto[sampler_name]
+    
+    if (scheduler_name == "karras"):
+        result += " Karras"
+    elif (scheduler_name == "exponential"):
+        result += " Exponential"
+    
+    return result
+
 class Sage_ConstructMetadata:
     def __init__(self):
         pass
@@ -116,17 +182,26 @@ class Sage_ConstructMetadata:
         metadata = ''
         lora_info = ''
         resource_hashes = {}
+        lora_hashes = ', Lora hashes: '
+        
+        resource_hashes['model'] = model_info['hash']
+        sampler_name = civitai_sampler_name(sampler_info['sampler'], sampler_info['scheduler'])
+        
         if lora_stack is None:
             lora_info = ""
         else: 
-            lora_info = lora_stack_to_string(lora_stack)
-        
-        resource_hashes['model'] = model_info['hash']
+            for lora in lora_stack:
+                lora_info += lora_to_string(lora[0], lora[1], lora[2])
+                lora_path = folder_paths.get_full_path_or_raise("loras", lora[0])
+                lora_name = str(pathlib.Path(lora_path).name)
+                lora_hash = get_file_sha256(lora_path)
+                resource_hashes[f"lora:{lora_name}"] = lora_hash
+                lora_hashes += f"{lora_name}: {lora_hash},"
         
         metadata = f"{positive_string} {lora_info}" + "\n" 
         metadata += f"Negative prompt: {negative_string}" + "\n"
-        metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_info['sampler']}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height},"
-        metadata += f"Model: {model_info['name']},Model hash: {model_info['hash']},  Version: v1.10-RC-6-actually-totally-comfyui, Hashes: {json.dumps(resource_hashes)}"
+        metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height},"
+        metadata += f"Model: {model_info['name']}, Model hash: {model_info['hash']}, Version: v1.10-RC-6-actually-totally-comfyui, Hashes: {json.dumps(resource_hashes)}{lora_hashes}"
         print(metadata)
         return metadata,
 
@@ -156,11 +231,7 @@ class Sage_CheckpointLoaderSimple:
         model_info = { "full_name": ckpt_name }
         model_info["path"] = folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
         model_info["name"] = pathlib.Path(model_info["full_name"]).name
-        
-        m = hashlib.sha256()
-        with open(model_info["path"], 'rb') as f:
-            m.update(f.read())
-        model_info["hash"] = str(m.digest().hex()[:10])
+        model_info["hash"] = get_file_sha256(model_info["path"])
     
         out = comfy.sd.load_checkpoint_guess_config(model_info["path"], output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
         result = (*out[:3], model_info)
@@ -336,6 +407,7 @@ NODE_CLASS_MAPPINGS = {
     #"Sage_MultiModelNameChooser": Sage_MultiModelNameChooser,
     "Sage_LoraStackToString": Sage_LoraStackToString,
     "Sage_LoraNameToString": Sage_LoraNameToString,
+    "Sage_DualCLIPTextEncode": Sage_DualCLIPTextEncode,
     "Sage_SamplerInfo": Sage_SamplerInfo,
     "Sage_KSampler": Sage_KSampler,
     "Sage_ConstructMetadata": Sage_ConstructMetadata,
@@ -349,6 +421,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     #"Sage_MultiModelNameChooser": "Multi Model Name Chooser",
     "Sage_LoraStackToString":   "Lora Stack to String",
     "Sage_LoraNameToString":  "Lora Name to String",
+    "Sage_DualCLIPTextEncode": "Prompts to CLIP",
     "Sage_SamplerInfo": "Sampler Info",
     "Sage_KSampler": "KSampler w/ Sampler Info",
     "Sage_ConstructMetadata": "Construct Metadata",
