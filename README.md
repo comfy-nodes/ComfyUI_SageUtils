@@ -4,6 +4,10 @@ I've started with a bunch of metadata nodes. There are several other node sets o
 
 Anything dealing with Lora Stacks is intended to be interoperable with other custom nodes that use those, though I'm also spinning my own versions of a few nodes so that you don't need to use other sets nodes with mine.
 
+There's an example workflow in the example folder, and I talk about how to use them below.
+
+![Example Workflow Image](examples/example_workflow.png)
+
 The current workflow for usage of these looks like this:
 
 Use the "Load Checkpoint with Name" node to load your model. It's got a special "model_info" output that has the path to the model and the model's sha256 hash. This is a custom node because I was unable to find any way to get the model path from the model output.
