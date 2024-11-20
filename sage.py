@@ -15,6 +15,89 @@ import nodes
 
 from .sage_utils import *
 
+class Sage_SetInteger:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "int": ("INT", {"defaultInput": False}),
+            }
+        }
+    
+    RETURN_TYPES = ("INT",)
+    RETURN_NAMES = ("int",)
+    
+    FUNCTION = "pass_int"
+    
+    CATEGORY = "Sage Utils/Primitives"
+    DESCRIPTION = "Sets an integer."
+    
+    def pass_int(self, int):
+        return (int,)
+    
+class Sage_SetFloat:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "float": ("FLOAT", {"defaultInput": False}),
+            }
+        }
+    
+    RETURN_TYPES = ("FLOAT",)
+    RETURN_NAMES = ("float",)
+    
+    FUNCTION = "pass_float"
+    
+    CATEGORY = "Sage Utils/Primitives"
+    DESCRIPTION = "Sets an float."
+    
+    def pass_float(self, float):
+        return (float,)
+
+class Sage_SetText:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "str": ("STRING", {"defaultInput": False, "multiline": True}),
+            }
+        }
+    
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("str",)
+    
+    FUNCTION = "pass_str"
+    
+    CATEGORY = "Sage Utils/Primitives"
+    DESCRIPTION = "Sets some text."
+    
+    def pass_str(self, str):
+        return (str,)
+
+# Commented out in __init__.py, because it doesn't currently work.
+class Sage_ViewText:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "str": ("STRING", {"defaultInput": True}),
+            }
+        }
+    
+    RETURN_TYPES = ()
+    RETURN_NAMES = ()
+    
+    FUNCTION = "show_str"
+    
+    CATEGORY = "Sage Utils/Primitives"
+    DESCRIPTION = "Shows some text."
+    OUTPUT_NODE = True
+    INPUT_IS_LIST = (True,)
+    
+    def show_str(self, str):
+       return ({"ui": {"text": [f"{str}"]}})
+    
 class Sage_DualCLIPTextEncode:
     @classmethod
     def INPUT_TYPES(s):
@@ -32,7 +115,7 @@ class Sage_DualCLIPTextEncode:
     FUNCTION = "encode"
 
     CATEGORY = "Sage Utils"
-    DESCRIPTION = "Turns a positive and negative prompt into to conditionings, to save space."
+    DESCRIPTION = "Turns a positive and negative prompt into conditionings, to save space."
 
     def encode(self, clip, pos, neg):
         pos_tokens = clip.tokenize(pos)
@@ -155,7 +238,6 @@ class Sage_ConstructMetadata:
         metadata += f"Negative prompt: {negative_string}" + "\n"
         metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height},"
         metadata += f"Model: {model_info['name']}, Model hash: {model_info['hash']}, Version: v1.10-RC-6-actually-totally-comfyui, Hashes: {json.dumps(resource_hashes)}{lora_hashes}"
-        print(metadata)
         return metadata,
 
 class Sage_CheckpointLoaderSimple:
@@ -205,7 +287,7 @@ class Sage_LoraStackDebugString:
     RETURN_TYPES = ("STRING",)
     
     FUNCTION = "output_value"
-    CATEGORY = "Sage Utils"
+    CATEGORY = "Sage Utils/Debug"
     
     def output_value(self, lora_stack):
         return (f"{lora_stack}",)
@@ -239,14 +321,12 @@ class Sage_LoraStack:
         lora = (lora_name, model_weight, clip_weight)
         if lora_stack is None:
             stack = [lora]
-            print(stack,)
             return(stack,)
         
         stack = []
         for the_name, m_weight, c_weight in lora_stack:
             stack.append((the_name, m_weight, c_weight))
         stack.append((lora_name, model_weight, clip_weight))
-        print(stack)
 
         return (stack,)
 
