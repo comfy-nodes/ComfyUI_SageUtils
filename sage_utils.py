@@ -9,7 +9,7 @@ def get_civitai_json(hash):
     return r.json()
 
 def lora_to_string(lora_name, model_weight, clip_weight):
-    lora_string = ' <lora:' + str(pathlib.Path(lora_name).name) + ":" + str(model_weight) + ":"  + str(clip_weight) +  ">"
+    lora_string = ' <lora:' + str(pathlib.Path(lora_name).name) + ":" + str(model_weight) +  ">" #  + ":" + str(clip_weight)
         
     return lora_string
 
