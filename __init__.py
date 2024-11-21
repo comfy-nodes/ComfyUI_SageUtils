@@ -7,6 +7,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_SetFloat": Sage_SetFloat,
     "Sage_SetText": Sage_SetText,
     #"Sage_ViewText": Sage_ViewText,
+    "Sage_GetFileHash": Sage_GetFileHash,
     "Sage_LoraStackDebugString": Sage_LoraStackDebugString,
     
     "Sage_CheckpointLoaderSimple": Sage_CheckpointLoaderSimple,
@@ -25,6 +26,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_SetFloat": "Set Float",
     "Sage_SetText": "Set Text",
     #"Sage_ViewText": "View Text",
+    "Sage_GetFileHash": "Get Sha256 Hash",
     "Sage_LoraStackDebugString": "Lora Stack Debug String",
     
     "Sage_CheckpointLoaderSimple": "Load Checkpoint With Name",

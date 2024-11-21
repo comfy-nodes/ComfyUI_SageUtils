@@ -24,7 +24,7 @@ Now, we're going to hook that "model_info" output, the "lora_stack" node (if you
 
 And finally, we run everything to the "Save Image w/ Added Metadata" node. This acts just like a normal Save Images node, except that it has a "param_metadata" input and and "extra_metadata" input. Both are regular strings, with the first saving to the "parameters" metadata keyword, and the second to "extra". In theory, you could hook anything to them, but the first is obviously intended for the output of the "Construct Metadata Node".
 
-I'll undoubtedly be adding more nodes. One to calculate sha256 hashes separately for anyone that wants to build the metadata themselves, for example, since I know I'm not covering some of the more exotic setups.
+There's also a utility node to calculate the sha256 of a file seperately, which could be used if you wanted to create the metadata yourself. I could potentially look up the model on civitai with that in the future. I'll undoubtedly be adding more nodes here and there.
 
 Feel free to file issues if you have idea or run into bugs, or, better yet, pr's, though there's no guarantee I'll accept them.
 

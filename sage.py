@@ -97,6 +97,36 @@ class Sage_ViewText:
     
     def show_str(self, str):
        return ({"ui": {"text": [f"{str}"]}})
+
+class Sage_GetFileHash:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "base_dir": (list(folder_paths.folder_names_and_paths.keys()), {"defaultInput": False}),
+                "filename": ("STRING", {"defaultInput": False}),
+            }
+        }
+        
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("hash",)
+    
+    FUNCTION = "get_hash"
+    
+    CATEGORY = "Sage Utils/Util"
+    DESCRIPTION = "Get an sha256 hash of a file. Can be used for detecting models, civitai calls and such."
+    
+    def get_hash(self, base_dir, filename):
+        the_hash = ""
+        try:
+            file_path = folder_paths.get_full_path_or_raise(base_dir, filename)
+            the_hash = get_file_sha256(file_path)
+        except:
+            print(f"Unable to hash file '{file_path}'. \n")
+            the_hash = ""
+        
+        print(f"Hash for '{file_path}': {the_hash}")
+        return (str(the_hash),)
     
 class Sage_DualCLIPTextEncode:
     @classmethod
