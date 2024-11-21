@@ -127,6 +127,29 @@ class Sage_GetFileHash:
         
         print(f"Hash for '{file_path}': {the_hash}")
         return (str(the_hash),)
+
+class Sage_GetModelJSONFromHash:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "hash": ("STRING", {"defaultInput": True})
+            }
+        }
+        
+    RETURN_TYPES = ("STRING",)
+    
+    FUNCTION = "pull_json"
+    CATEGORY = "Sage Utils/Util"
+    DESCRIPTION = "Turns a positive and negative prompt into conditionings, to save space."
+
+    def pull_json(self, hash):
+        the_json = {}
+        try:
+            the_json = get_civitai_json(hash)
+        except:
+            the_json = {}
+        return(f"{json.dumps(the_json)}",)
     
 class Sage_DualCLIPTextEncode:
     @classmethod

@@ -2,6 +2,11 @@
 
 import pathlib
 import hashlib
+import requests
+
+def get_civitai_json(hash):
+    r = requests.get("https://civitai.com/api/v1/model-versions/by-hash/" + hash)
+    return r.json()
 
 def lora_to_string(lora_name, model_weight, clip_weight):
     lora_string = ' <lora:' + str(pathlib.Path(lora_name).name) + ":" + str(model_weight) + ":"  + str(clip_weight) +  ">"
