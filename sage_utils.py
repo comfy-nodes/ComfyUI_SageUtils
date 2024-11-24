@@ -58,7 +58,11 @@ def civitai_sampler_name(sampler_name, scheduler_name):
         'uni_pc': 'UniPC',
         'uni_pc_bh2': 'UniPC'
     }
-    result = comfy_to_auto[sampler_name]
+    result = ""
+    try:
+        result = comfy_to_auto[sampler_name]
+    except:
+        result = f"{sampler_name}"
     
     if (scheduler_name == "karras"):
         result += " Karras"
