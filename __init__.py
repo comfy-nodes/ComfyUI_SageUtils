@@ -1,4 +1,5 @@
 from .sage import *
+from .sage_basic import *
 
 # A dictionary that contains all nodes you want to export with their names
 # NOTE: names should be globally unique
@@ -7,6 +8,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_SetFloat": Sage_SetFloat,
     "Sage_SetText": Sage_SetText,
     #"Sage_ViewText": Sage_ViewText,
+    "Sage_ConditioningZeroOut": Sage_ConditioningZeroOut,
     "Sage_GetFileHash": Sage_GetFileHash,
     "Sage_GetModelJSONFromHash": Sage_GetModelJSONFromHash,
     "Sage_LoraStackDebugString": Sage_LoraStackDebugString,
@@ -27,6 +29,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_SetFloat": "Set Float",
     "Sage_SetText": "Set Text",
     #"Sage_ViewText": "View Text",
+    "Sage_ConditioningZeroOut": "Zero Conditioning",
     "Sage_GetFileHash": "Get Sha256 Hash",
     "Sage_GetModelJSONFromHash": "Get Model JSON From Hash",
     "Sage_LoraStackDebugString": "Lora Stack Debug String",
