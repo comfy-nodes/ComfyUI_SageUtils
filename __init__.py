@@ -13,6 +13,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_GetInfoFromHash": Sage_GetInfoFromHash,
     "Sage_GetModelJSONFromHash": Sage_GetModelJSONFromHash,
     "Sage_LoraStackDebugString": Sage_LoraStackDebugString,
+    "Sage_CollectKeywordsFromLoraStack": Sage_CollectKeywordsFromLoraStack,
     
     "Sage_CheckpointLoaderSimple": Sage_CheckpointLoaderSimple,
     "Sage_LoraStack": Sage_LoraStack,
@@ -35,7 +36,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_GetInfoFromHash": "Get Model Info From Hash",
     "Sage_GetModelJSONFromHash": "Get Model JSON From Hash",
     "Sage_LoraStackDebugString": "Lora Stack Debug String",
-    
+    "Sage_CollectKeywordsFromLoraStack": "Collect Keywords from Lora Stack" ,   
     "Sage_CheckpointLoaderSimple": "Load Checkpoint With Name",
     "Sage_LoraStack":   "Simple Lora Stack",
     "Sage_LoraStackLoader": "Lora Stack Loader",

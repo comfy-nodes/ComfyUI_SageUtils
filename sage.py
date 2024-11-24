@@ -15,6 +15,45 @@ import nodes
 
 from .sage_utils import *
 
+class Sage_CollectKeywordsFromLoraStack:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "lora_stack": ("LORA_STACK", {"defaultInput": True})
+            }
+        }
+    
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("keywords",)
+
+    FUNCTION = "get_keywords"
+
+    CATEGORY = "Sage Utils/Util"
+    DESCRIPTION = "Go through each model in the lora stack, grab any keywords from civitai, and combine them into one string. Place at the end of a lora_stack, or you won't get keywords for the entire stack."
+
+    def get_keywords(self, lora_stack):
+        lora_keywords = []
+        if lora_stack is None:
+            return ("",)
+        
+        for lora in lora_stack:
+            try:
+                print(f"Lora is {lora}")
+                lora_path = folder_paths.get_full_path_or_raise("loras", lora[0])
+                hash = get_file_sha256(lora_path)
+
+                json = get_civitai_json(hash)
+                keywords = json["trainedWords"]
+                if keywords != []:
+                    lora_keywords.extend(keywords)
+            except:
+                print("Exception getting keywords!")
+                continue
+        
+        ret = ",".join(lora_keywords)
+        return (ret,)
+
 class Sage_GetInfoFromHash:
     @classmethod
     def INPUT_TYPES(s):
@@ -282,12 +321,13 @@ class Sage_CheckpointLoaderSimple:
                 "ckpt_name": (folder_paths.get_filename_list("checkpoints"), {"tooltip": "The name of the checkpoint (model) to load."}),
             }
         }
-    RETURN_TYPES = ("MODEL", "CLIP", "VAE", "MODEL_INFO", )
-    RETURN_NAMES = ("model", "clip", "vae", "model_info")
+    RETURN_TYPES = ("MODEL", "CLIP", "VAE", "MODEL_INFO", "STRING")
+    RETURN_NAMES = ("model", "clip", "vae", "model_info", "hash")
     OUTPUT_TOOLTIPS = ("The model used for denoising latents.", 
                        "The CLIP model used for encoding text prompts.", 
                        "The VAE model used for encoding and decoding images to and from latent space.",
-                       "The name of the model.")
+                       "The model name, path, and hash, all in one output.",
+                       "The hash of the model")
     FUNCTION = "load_checkpoint"
 
     CATEGORY  =  "Sage Utils"
@@ -300,7 +340,7 @@ class Sage_CheckpointLoaderSimple:
         model_info["hash"] = get_file_sha256(model_info["path"])
     
         out = comfy.sd.load_checkpoint_guess_config(model_info["path"], output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
-        result = (*out[:3], model_info)
+        result = (*out[:3], model_info, model_info["hash"])
         return (result)
  
 class Sage_LoraStackDebugString:
