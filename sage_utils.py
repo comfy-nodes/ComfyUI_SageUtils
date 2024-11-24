@@ -3,6 +3,7 @@
 import pathlib
 import hashlib
 import requests
+import folder_paths
 
 def get_civitai_json(hash):
     r = requests.get("https://civitai.com/api/v1/model-versions/by-hash/" + hash)
@@ -27,6 +28,12 @@ def get_file_sha256(path):
         m.update(f.read())
     result = str(m.digest().hex()[:10])
     return result
+
+def get_lora_hash(lora_name):
+    lora_path = folder_paths.get_full_path_or_raise("loras", lora_name)
+    hash = get_file_sha256(lora_path)
+
+    return hash
 
 def civitai_sampler_name(sampler_name, scheduler_name):
     comfy_to_auto = {
