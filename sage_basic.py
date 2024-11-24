@@ -60,6 +60,28 @@ class Sage_SetText:
     def pass_str(self, str):
         return (str,)
 
+class Sage_JoinText:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "separator": ("STRING", {"defaultInput": False}),
+                "str1": ("STRING", {"defaultInput": True, "multiline": True}),
+                "str2": ("STRING", {"defaultInput": True, "multiline": True}),
+            }
+        }
+    
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("str",)
+    
+    FUNCTION = "join_str"
+    
+    CATEGORY = "Sage Utils/Primitives"
+    DESCRIPTION = "Joins two strings with a separator."
+    
+    def join_str(self, separator, str1, str2):
+        return (separator.join([str1, str2]),)
+
 # Commented out in __init__.py, because it doesn't currently work.
 class Sage_ViewText:
     @classmethod
@@ -107,7 +129,7 @@ class Sage_ConditioningZeroOut:
 
         if pooled_output is not None:
             output["pooled_output"] = torch.zeros_like(pooled_output)
-            
+
         n = [torch.zeros_like(conditioning), output]
         c.append(n)
         return (c, )
