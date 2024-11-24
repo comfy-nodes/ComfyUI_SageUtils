@@ -15,6 +15,45 @@ import nodes
 
 from .sage_utils import *
 
+class Sage_GetInfoFromHash:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "hash": ("STRING", {"defaultInput": True})
+            }
+        }
+    
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING")
+    RETURN_NAMES = ("type", "base_model", "version_id", "model_id", "name", "version", "trained_words")
+
+    FUNCTION = "get_info"
+    
+    CATEGORY = "Sage Utils/Util"
+    DESCRIPTION = "Pull out various useful pieces of information from a hash, such as the model and version id, the model name and version, what model it's based on, and what keywords it has."
+
+    def get_info(self, hash):
+        ret = []
+        try:
+            json = get_civitai_json(hash)
+            ret.append(json["model"]["type"])
+            ret.append(json["baseModel"])
+            ret.append(str(json["id"]))
+            ret.append(str(json["modelId"]))
+            ret.append(json["model"]["name"])
+            ret.append(json["name"])
+            words = json["trainedWords"]
+
+            if words == []:
+                ret.append("")
+            else:
+                ret.append(",".join(words))
+        except:
+            print("Exception when getting json data.")
+            ret = ["0", "1", "2", "3", "4", "5", "6"]
+        
+        return (ret[0], ret[1], ret[2], ret[3], ret[4], ret[5], ret[6], )
+
 class Sage_GetFileHash:
     @classmethod
     def INPUT_TYPES(s):

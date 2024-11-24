@@ -10,6 +10,7 @@ NODE_CLASS_MAPPINGS = {
     #"Sage_ViewText": Sage_ViewText,
     "Sage_ConditioningZeroOut": Sage_ConditioningZeroOut,
     "Sage_GetFileHash": Sage_GetFileHash,
+    "Sage_GetInfoFromHash": Sage_GetInfoFromHash,
     "Sage_GetModelJSONFromHash": Sage_GetModelJSONFromHash,
     "Sage_LoraStackDebugString": Sage_LoraStackDebugString,
     
@@ -31,6 +32,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     #"Sage_ViewText": "View Text",
     "Sage_ConditioningZeroOut": "Zero Conditioning",
     "Sage_GetFileHash": "Get Sha256 Hash",
+    "Sage_GetInfoFromHash": "Get Model Info From Hash",
     "Sage_GetModelJSONFromHash": "Get Model JSON From Hash",
     "Sage_LoraStackDebugString": "Lora Stack Debug String",
     
