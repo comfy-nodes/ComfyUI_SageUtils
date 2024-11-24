@@ -23,7 +23,8 @@ NODE_CLASS_MAPPINGS = {
     "Sage_SamplerInfo": Sage_SamplerInfo,
     "Sage_KSampler": Sage_KSampler,
     "Sage_ConstructMetadata": Sage_ConstructMetadata,
-    "Sage_SaveImageWithMetadata": Sage_SaveImageWithMetadata
+    "Sage_SaveImageWithMetadata": Sage_SaveImageWithMetadata,
+    "Sage_PonyPrefix": Sage_PonyPrefix
 }
  
 # A dictionary that contains the friendly/humanly readable titles for the nodes
@@ -46,7 +47,8 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_SamplerInfo": "Sampler Info",
     "Sage_KSampler": "KSampler w/ Sampler Info",
     "Sage_ConstructMetadata": "Construct Metadata",
-    "Sage_SaveImageWithMetadata": "Save Image with Added Metadata"
+    "Sage_SaveImageWithMetadata": "Save Image with Added Metadata",
+    "Sage_PonyPrefix": "Add Pony v6 Prefixes"
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS'] 
