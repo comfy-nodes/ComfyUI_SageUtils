@@ -1,13 +1,13 @@
 {
-  "last_node_id": 82,
-  "last_link_id": 147,
+  "last_node_id": 86,
+  "last_link_id": 153,
   "nodes": [
     {
       "id": 44,
       "type": "Sage_LoraStack",
       "pos": [
-        15.210284233093262,
-        566.2100219726562
+        14.000284194946289,
+        556.5299072265625
       ],
       "size": [
         291.3483581542969,
@@ -110,52 +110,11 @@
       ]
     },
     {
-      "id": 55,
-      "type": "Sage_LoraStack",
-      "pos": [
-        622.2098999023438,
-        566.2100219726562
-      ],
-      "size": [
-        315,
-        106
-      ],
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "lora_stack",
-          "type": "LORA_STACK",
-          "link": 122,
-          "shape": 7
-        }
-      ],
-      "outputs": [
-        {
-          "name": "lora_stack",
-          "type": "LORA_STACK",
-          "links": [
-            124
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "Sage_LoraStack"
-      },
-      "widgets_values": [
-        "pony/style/Pony_DetailV2.0.safetensors",
-        1,
-        1
-      ]
-    },
-    {
       "id": 45,
       "type": "Sage_LoraStack",
       "pos": [
-        326.2098388671875,
-        568.2100219726562
+        324.9998474121094,
+        558.5299072265625
       ],
       "size": [
         284.0583801269531,
@@ -200,7 +159,7 @@
       ],
       "size": [
         315,
-        118
+        138
       ],
       "flags": {},
       "order": 3,
@@ -238,6 +197,11 @@
             135
           ],
           "slot_index": 3
+        },
+        {
+          "name": "hash",
+          "type": "STRING",
+          "links": null
         }
       ],
       "properties": {
@@ -276,85 +240,6 @@
         "Node name for S&R": "Sage_SetText"
       },
       "widgets_values": [
-        "signature, watermark"
-      ]
-    },
-    {
-      "id": 33,
-      "type": "Sage_DualCLIPTextEncode",
-      "pos": [
-        624,
-        949
-      ],
-      "size": [
-        210,
-        94
-      ],
-      "flags": {},
-      "order": 13,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip",
-          "type": "CLIP",
-          "link": 99
-        },
-        {
-          "name": "pos",
-          "type": "STRING",
-          "link": 115,
-          "widget": {
-            "name": "pos"
-          }
-        },
-        {
-          "name": "neg",
-          "type": "STRING",
-          "link": 116,
-          "widget": {
-            "name": "neg"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "pos_cond",
-          "type": "CONDITIONING",
-          "links": [
-            51
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "neg_cond",
-          "type": "CONDITIONING",
-          "links": [
-            52
-          ],
-          "slot_index": 1
-        },
-        {
-          "name": "pos_text",
-          "type": "STRING",
-          "links": [
-            138
-          ],
-          "slot_index": 2
-        },
-        {
-          "name": "neg_text",
-          "type": "STRING",
-          "links": [
-            139
-          ],
-          "slot_index": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "Sage_DualCLIPTextEncode"
-      },
-      "widgets_values": [
-        "score_9, score_8_up, scoure_7_up, score_6_up, score_5_up, score_4_up",
         "signature, watermark"
       ]
     },
@@ -432,7 +317,7 @@
         350
       ],
       "flags": {},
-      "order": 14,
+      "order": 16,
       "mode": 0,
       "inputs": [
         {
@@ -490,7 +375,7 @@
         46
       ],
       "flags": {},
-      "order": 16,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
@@ -570,38 +455,6 @@
       ]
     },
     {
-      "id": 71,
-      "type": "Sage_SetText",
-      "pos": [
-        9,
-        1026
-      ],
-      "size": [
-        363.3683776855469,
-        161.9385986328125
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "str",
-          "type": "STRING",
-          "links": [
-            115
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "Sage_SetText"
-      },
-      "widgets_values": [
-        "source_furry, rating_safe, galactic cosmic funk cat floating in space, stars, planets, lasers, colorful, funky, groovy, yellow eyes, fur, furry, fur tufts, volumetric lighting, soft shading"
-      ]
-    },
-    {
       "id": 68,
       "type": "Sage_SamplerInfo",
       "pos": [
@@ -613,7 +466,7 @@
         178
       ],
       "flags": {},
-      "order": 6,
+      "order": 5,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -650,7 +503,7 @@
         106.4585952758789
       ],
       "flags": {},
-      "order": 7,
+      "order": 6,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -679,10 +532,10 @@
       ],
       "size": [
         252,
-        310
+        358
       ],
       "flags": {},
-      "order": 17,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
@@ -716,6 +569,229 @@
       "widgets_values": [
         "ComfyUI_Meta",
         "",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 82,
+      "type": "Note",
+      "pos": [
+        1158,
+        567
+      ],
+      "size": [
+        436.8099670410156,
+        77.44001770019531
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "Hook up a Show Text node from another custom node pack to param_metadata if you want to see the generated metadata."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 33,
+      "type": "Sage_DualCLIPTextEncode",
+      "pos": [
+        624,
+        949
+      ],
+      "size": [
+        210,
+        94
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 99
+        },
+        {
+          "name": "pos",
+          "type": "STRING",
+          "link": 152,
+          "widget": {
+            "name": "pos"
+          }
+        },
+        {
+          "name": "neg",
+          "type": "STRING",
+          "link": 116,
+          "widget": {
+            "name": "neg"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "pos_cond",
+          "type": "CONDITIONING",
+          "links": [
+            51
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "neg_cond",
+          "type": "CONDITIONING",
+          "links": [
+            52
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "pos_text",
+          "type": "STRING",
+          "links": [
+            138
+          ],
+          "slot_index": 2
+        },
+        {
+          "name": "neg_text",
+          "type": "STRING",
+          "links": [
+            139
+          ],
+          "slot_index": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Sage_DualCLIPTextEncode"
+      },
+      "widgets_values": [
+        "score_9, score_8_up, scoure_7_up, score_6_up, score_5_up, score_4_up",
+        "signature, watermark"
+      ]
+    },
+    {
+      "id": 71,
+      "type": "Sage_SetText",
+      "pos": [
+        -3,
+        1064
+      ],
+      "size": [
+        363.3683776855469,
+        161.9385986328125
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "str",
+          "type": "STRING",
+          "links": [
+            149
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Sage_SetText"
+      },
+      "widgets_values": [
+        "source_furry, rating_safe, galactic cosmic funk cat floating in space, stars, planets, lasers, colorful, funky, groovy, yellow eyes, fur, furry, fur tufts, volumetric lighting, soft shading"
+      ]
+    },
+    {
+      "id": 85,
+      "type": "Sage_CollectKeywordsFromLoraStack",
+      "pos": [
+        505,
+        734
+      ],
+      "size": [
+        184.8000030517578,
+        26
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "lora_stack",
+          "type": "LORA_STACK",
+          "link": 151
+        }
+      ],
+      "outputs": [
+        {
+          "name": "keywords",
+          "type": "STRING",
+          "links": [
+            150
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Sage_CollectKeywordsFromLoraStack"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 84,
+      "type": "Sage_JoinText",
+      "pos": [
+        707,
+        797
+      ],
+      "size": [
+        210,
+        78
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "str1",
+          "type": "STRING",
+          "link": 149,
+          "widget": {
+            "name": "str1"
+          }
+        },
+        {
+          "name": "str2",
+          "type": "STRING",
+          "link": 150,
+          "widget": {
+            "name": "str2"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "str",
+          "type": "STRING",
+          "links": [
+            152
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Sage_JoinText"
+      },
+      "widgets_values": [
+        ",",
+        "",
         ""
       ]
     },
@@ -731,7 +807,7 @@
         154
       ],
       "flags": {},
-      "order": 15,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {
@@ -788,7 +864,8 @@
           "name": "param_metadata",
           "type": "STRING",
           "links": [
-            143
+            143,
+            153
           ],
           "slot_index": 0
         }
@@ -804,27 +881,86 @@
       ]
     },
     {
-      "id": 82,
-      "type": "Note",
+      "id": 55,
+      "type": "Sage_LoraStack",
       "pos": [
-        1158,
-        567
+        620.9998779296875,
+        556.5299072265625
       ],
       "size": [
-        436.8099670410156,
-        77.44001770019531
+        315,
+        106
       ],
       "flags": {},
-      "order": 8,
+      "order": 11,
       "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "properties": {},
-      "widgets_values": [
-        "Hook up a Show Text node from another custom node pack to param_metadata if you want to see the generated metadata."
+      "inputs": [
+        {
+          "name": "lora_stack",
+          "type": "LORA_STACK",
+          "link": 122,
+          "shape": 7
+        }
       ],
-      "color": "#432",
-      "bgcolor": "#653"
+      "outputs": [
+        {
+          "name": "lora_stack",
+          "type": "LORA_STACK",
+          "links": [
+            124,
+            151
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Sage_LoraStack"
+      },
+      "widgets_values": [
+        "pony/hanginglegs_pony_v1.0a.safetensors",
+        1,
+        1
+      ]
+    },
+    {
+      "id": 86,
+      "type": "ShowText|pysssss",
+      "pos": [
+        1524,
+        736
+      ],
+      "size": [
+        591.6083984375,
+        448.6982421875
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 153,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "",
+        "source_furry, rating_safe, galactic cosmic funk cat floating in space, stars, planets, lasers, colorful, funky, groovy, yellow eyes, fur, furry, fur tufts, volumetric lighting, soft shading,hanging legs  <lora:Pony_QualityV4.0.safetensors:1.0> <lora:Wholesome-MLP-v1.3b.safetensors:1.0> <lora:hanginglegs_pony_v1.0a.safetensors:1.0>\nNegative prompt: signature, watermark\nSteps: 20, Sampler: DPM++ 2M, Scheduler type: beta, CFG scale: 5.5, Seed: 0, Size: 1024x1024,Model: ponyDiffusionV6XL_v6.safetensors, Model hash: 67ab2fd8ec, Version: v1.10-RC-6-comfyui, Civitai resources: [{\"type\": \"LORA\", \"weight\": 1.0, \"modelVersionId\": 449871, \"modelName\": \"PonyDiffusion Quality Slider\", \"modelVersionName\": \"v4.0\"}, {\"type\": \"LORA\", \"weight\": 1.0, \"modelVersionId\": 1009856, \"modelName\": \"Wholesome MLP Mix (Pony V6 XL)\", \"modelVersionName\": \"v1.3\"}, {\"type\": \"LORA\", \"weight\": 1.0, \"modelVersionId\": 1083874, \"modelName\": \"Hanging legs / Foot dangle | Pony\", \"modelVersionName\": \"v1.0\"}], Lora hashes: Pony_QualityV4.0.safetensors: dc8a759e63,Wholesome-MLP-v1.3b.safetensors: 51b7e8a96b,hanginglegs_pony_v1.0a.safetensors: a10f7e9744,"
+      ]
     }
   ],
   "links": [
@@ -941,14 +1077,6 @@
       "INT"
     ],
     [
-      115,
-      71,
-      0,
-      33,
-      1,
-      "STRING"
-    ],
-    [
       116,
       72,
       0,
@@ -1043,6 +1171,46 @@
       3,
       1,
       "STRING"
+    ],
+    [
+      149,
+      71,
+      0,
+      84,
+      0,
+      "STRING"
+    ],
+    [
+      150,
+      85,
+      0,
+      84,
+      1,
+      "STRING"
+    ],
+    [
+      151,
+      55,
+      0,
+      85,
+      0,
+      "LORA_STACK"
+    ],
+    [
+      152,
+      84,
+      0,
+      33,
+      1,
+      "STRING"
+    ],
+    [
+      153,
+      76,
+      0,
+      86,
+      0,
+      "STRING"
     ]
   ],
   "groups": [
@@ -1050,8 +1218,8 @@
       "id": 1,
       "title": "Loras",
       "bounding": [
-        5.2102789878845215,
-        492.6099548339844,
+        4.000278949737549,
+        482.92999267578125,
         941.999267578125,
         191.60000610351562
       ],
@@ -1063,10 +1231,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.8264462809917363,
+      "scale": 0.8264462809917354,
       "offset": [
-        86.69162744715706,
-        -522.468256584798
+        55.121627447158346,
+        -471.5382565847977
       ]
     },
     "linkExtensions": [
