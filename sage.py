@@ -411,8 +411,10 @@ class Sage_LoraStackLoader:
         return {
             "required": { 
                 "model": ("MODEL", {"tooltip": "The diffusion model the LoRA will be applied to."}),
-                "clip": ("CLIP", {"tooltip": "The CLIP model the LoRA will be applied to."}),
-                "lora_stack": ("LORA_STACK", {"defaultInput": True})
+                "clip": ("CLIP", {"tooltip": "The CLIP model the LoRA will be applied to."})
+            },
+            "optional": {
+                 "lora_stack": ("LORA_STACK", {"defaultInput": True})
             }
         }
     
@@ -444,7 +446,11 @@ class Sage_LoraStackLoader:
         model_lora, clip_lora = comfy.sd.load_lora_for_models(model, clip, lora, strength_model, strength_clip)
         return (model_lora, clip_lora)
     
-    def load_loras(self, model, clip, lora_stack):
+    def load_loras(self, model, clip, lora_stack = None):
+        if lora_stack is None:
+            print("No lora stacks found. Warning: Passing 'None' to lora_stack output.")
+            return (model, clip, None)
+
         for lora in lora_stack:
             model, clip = self.load_lora(model, clip, lora[0], lora[1], lora[2]) if lora else None
         return (model, clip, lora_stack)
