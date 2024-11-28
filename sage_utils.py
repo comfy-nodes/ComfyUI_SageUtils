@@ -26,24 +26,29 @@ def lora_stack_to_string(stack):
 def get_file_sha256(path):
     cache_data = {}
     cache_path = pathlib.Path(folder_paths.base_path) / "custom_nodes" / "ComfyUI_SageUtils" / "sage_cache.json"
-    if cache_path.is_file():
-        with cache_path.open("r") as read_file:
-            cache_data = json.load(read_file)
-    
-    if path in cache_data:
-        if 'hash' in cache_data[path]:
-            return cache_data[path]["hash"]
+    try:
+        if cache_path.is_file():
+            with cache_path.open("r") as read_file:
+                cache_data = json.load(read_file)
+        
+        if path in cache_data:
+            if 'hash' in cache_data[path]:
+                return cache_data[path]["hash"]
+    except:
+        cache_data = {}
         
     m = hashlib.sha256()
     with open(path, 'rb') as f:
         m.update(f.read())
     result = str(m.digest().hex()[:10])
 
-    cache_data[path] = {}
-    cache_data[path]["hash"] = result
-
-    with cache_path.open("w") as output_file:
-        output_file.write(json.dumps(cache_data, separators=(",", ":"), sort_keys=True, indent=4))
+    try:
+        cache_data[path] = {}
+        cache_data[path]["hash"] = result
+        with cache_path.open("w") as output_file:
+            output_file.write(json.dumps(cache_data, separators=(",", ":"), sort_keys=True, indent=4))
+    except:
+        print("Unable to save cache.")
 
     return result
 
