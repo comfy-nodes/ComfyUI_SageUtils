@@ -25,7 +25,7 @@ def lora_stack_to_string(stack):
 
 def get_file_sha256(path):
     cache_data = {}
-    cache_path = pathlib.Path.cwd() / "custom_nodes" / "ComfyUI_SageUtils" / "sage_cache.json"
+    cache_path = pathlib.Path(folder_paths.base_path) / "custom_nodes" / "ComfyUI_SageUtils" / "sage_cache.json"
     if cache_path.is_file():
         with cache_path.open("r") as read_file:
             cache_data = json.load(read_file)
