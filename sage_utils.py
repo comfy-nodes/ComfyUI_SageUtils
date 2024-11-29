@@ -5,6 +5,7 @@ import hashlib
 import requests
 import folder_paths
 import json
+import comfy.utils
 
 import ComfyUI_SageUtils.sage_cache as cache
 
@@ -66,6 +67,22 @@ def get_lora_hash(lora_name):
     pull_metadata(lora_path)
 
     return cache.cache_data[lora_path]["hash"]
+
+def pull_all_loras(the_path):
+    the_paths = the_path[0]
+    ret = []
+    for dir in the_paths:
+        result = list(p.resolve() for p in pathlib.Path(dir).glob("**/*") if p.suffix in {".safetensors", ".ckpt"})
+        ret.extend(result)
+
+    ret = list(set(ret))
+    print(f"There are {len(ret)} files.")
+    pbar = comfy.utils.ProgressBar(len(ret))
+    for the_model in ret:
+        pbar.update(1)
+        pull_metadata(str(the_model))
+    
+    return ret
 
 def civitai_sampler_name(sampler_name, scheduler_name):
     comfy_to_auto = {

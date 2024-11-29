@@ -97,6 +97,28 @@ class Sage_GetInfoFromHash:
         
         return (ret[0], ret[1], ret[2], ret[3], ret[4], ret[5], ret[6], ret[7],)
 
+class Sage_IterOverFiles:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "base_dir": (list(folder_paths.folder_names_and_paths.keys()), {"defaultInput": False}),
+            }
+        }
+        
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("list",)
+    
+    FUNCTION = "get_files"
+    
+    CATEGORY = "Sage Utils/Util"
+    DESCRIPTION = "Calculates the hash of every checkpoint in the directory and pulls civitai information. Takes forever. Returns the filenames."
+    
+    def get_files(self, base_dir):
+        ret = pull_all_loras(folder_paths.folder_names_and_paths[base_dir])
+        return (f"{ret}",)
+
+
 class Sage_GetFileHash:
     @classmethod
     def INPUT_TYPES(s):
