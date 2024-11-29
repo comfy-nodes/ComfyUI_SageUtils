@@ -1,3 +1,6 @@
+import ComfyUI_SageUtils.sage_cache
+import ComfyUI_SageUtils.sage_utils
+
 from .sage import *
 from .sage_basic import *
 

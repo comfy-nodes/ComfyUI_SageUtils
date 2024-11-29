@@ -11,7 +11,7 @@ def load_cache():
 
     try:
         if cache_path.is_file():
-            with cache_path.open("r") as read_file:
+            with cache_path.open(mode = "r") as read_file:
                 cache_data = json.load(read_file)
     except:
         print("Unable to load cache.")
@@ -21,8 +21,7 @@ def save_cache():
     global cache_path
 
     try:
-        with cache_path.open("w") as output_file:
+        with cache_path.open(mode = "w") as output_file:
             output_file.write(json.dumps(cache_data, separators=(",", ":"), sort_keys=True, indent=4))
     except:
         print("Unable to save cache.")
-

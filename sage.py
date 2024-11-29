@@ -14,6 +14,8 @@ import cli_args
 import nodes
 
 from .sage_utils import *
+import ComfyUI_SageUtils.sage_cache as cache
+
 
 class Sage_CollectKeywordsFromLoraStack:
     @classmethod
@@ -62,8 +64,8 @@ class Sage_GetInfoFromHash:
             }
         }
     
-    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING")
-    RETURN_NAMES = ("type", "base_model", "version_id", "model_id", "name", "version", "trained_words")
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING")
+    RETURN_NAMES = ("type", "base_model", "version_id", "model_id", "name", "version", "trained_words", "url")
 
     FUNCTION = "get_info"
     
@@ -72,6 +74,8 @@ class Sage_GetInfoFromHash:
 
     def get_info(self, hash):
         ret = []
+        path = ""
+
         try:
             json = get_civitai_json(hash)
             ret.append(json["model"]["type"])
@@ -86,11 +90,12 @@ class Sage_GetInfoFromHash:
                 ret.append("")
             else:
                 ret.append(",".join(words))
+            ret.append(json["downloadUrl"])
         except:
             print("Exception when getting json data.")
-            ret = ["0", "1", "2", "3", "4", "5", "6"]
+            ret = ["0", "1", "2", "3", "4", "5", "6", "7"]
         
-        return (ret[0], ret[1], ret[2], ret[3], ret[4], ret[5], ret[6], )
+        return (ret[0], ret[1], ret[2], ret[3], ret[4], ret[5], ret[6], ret[7],)
 
 class Sage_GetFileHash:
     @classmethod
@@ -114,7 +119,8 @@ class Sage_GetFileHash:
         the_hash = ""
         try:
             file_path = folder_paths.get_full_path_or_raise(base_dir, filename)
-            the_hash = get_file_sha256(file_path)
+            pull_metadata(file_path)
+            the_hash = cache.cache_data[file_path]["hash"]
         except:
             print(f"Unable to hash file '{file_path}'. \n")
             the_hash = ""
@@ -267,16 +273,15 @@ class Sage_ConstructMetadata:
                 lora_info += lora_to_string(lora[0], lora[1], lora[2])
         return lora_info
     
-    def get_model_info(self, lora_hash, weight):
+    def get_model_info(self, lora_path, weight):
         try:
-            the_json = get_civitai_json(lora_hash)
             ret = {}
-            ret["type"] = the_json["model"]["type"]
+            ret["type"] = cache.cache__data[lora_path]["model"]["type"]
             if ret["type"] == "LORA":
                 ret["weight"] = weight
-            ret["modelVersionId"] = the_json["id"]
-            ret["modelName"] = the_json["model"]["name"]
-            ret["modelVersionName"] = the_json["name"]
+            ret["modelVersionId"] = cache.cache__data[lora_path]["id"]
+            ret["modelName"] = cache.cache__data[lora_path]["model"]["name"]
+            ret["modelVersionName"] = cache.cache__data[lora_path]["name"]
         except:
             ret = {}
         return ret
@@ -297,8 +302,9 @@ class Sage_ConstructMetadata:
             for lora in lora_stack:
                 lora_path = folder_paths.get_full_path_or_raise("loras", lora[0])
                 lora_name = str(pathlib.Path(lora_path).name)
-                lora_hash = get_file_sha256(lora_path)
-                lora_data = self.get_model_info(lora_hash, lora[1])
+                pull_metadata(lora_path)
+                lora_hash = cache.cache_data[lora_path]["hash"]
+                lora_data = self.get_model_info(lora_path, lora[1])
                 if lora_data != {}:
                     resource_hashes.append(lora_data)
                 lora_hashes += f"{lora_name}: {lora_hash},"
@@ -337,7 +343,8 @@ class Sage_CheckpointLoaderSimple:
         model_info = { "full_name": ckpt_name }
         model_info["path"] = folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
         model_info["name"] = pathlib.Path(model_info["full_name"]).name
-        model_info["hash"] = get_file_sha256(model_info["path"])
+        pull_metadata(model_info["path"])
+        model_info["hash"] = cache.cache_data[model_info["path"]]["hash"]
     
         out = comfy.sd.load_checkpoint_guess_config(model_info["path"], output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
         result = (*out[:3], model_info, model_info["hash"])
