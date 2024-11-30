@@ -37,10 +37,10 @@ def pull_metadata(file_path):
         cache.cache_data[file_path]["trainedWords"] = json["trainedWords"]
         cache.cache_data[file_path]["downloadUrl"] = json["downloadUrl"]
 
-        cache.save_cache()
-
     except:
         print(f"Failed to pull metadata for {file_path} with hash {hash}")
+
+    cache.save_cache()
 
 def lora_to_string(lora_name, model_weight, clip_weight):
     lora_string = ' <lora:' + str(pathlib.Path(lora_name).name) + ":" + str(model_weight) +  ">" #  + ":" + str(clip_weight)
