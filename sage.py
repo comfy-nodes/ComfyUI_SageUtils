@@ -112,7 +112,7 @@ class Sage_IterOverFiles:
     FUNCTION = "get_files"
     
     CATEGORY = "Sage Utils/Util"
-    DESCRIPTION = "Calculates the hash of every checkpoint in the directory and pulls civitai information. Takes forever. Returns the filenames."
+    DESCRIPTION = "Calculates the hash of every model in the chosen directory and pulls civitai information. Takes forever. Returns the filenames."
     
     def get_files(self, base_dir):
         ret = pull_all_loras(folder_paths.folder_names_and_paths[base_dir])
@@ -163,7 +163,7 @@ class Sage_GetModelJSONFromHash:
     
     FUNCTION = "pull_json"
     CATEGORY = "Sage Utils/Util"
-    DESCRIPTION = "Turns a positive and negative prompt into conditionings, to save space."
+    DESCRIPTION = "Returns the JSON that civitai will give you, based on a hash. Useful if you want to see all the information, just what I'm using. This is the specific version hash."
 
     def pull_json(self, hash):
         the_json = {}
@@ -190,7 +190,7 @@ class Sage_DualCLIPTextEncode:
     FUNCTION = "encode"
 
     CATEGORY = "Sage Utils"
-    DESCRIPTION = "Turns a positive and negative prompt into conditionings, to save space."
+    DESCRIPTION = "Turns a positive and negative prompt into conditionings, and passes through the prompts. Saves space over two CLIP Text Encoders."
 
     def encode(self, clip, pos, neg):
         pos_tokens = clip.tokenize(pos)
@@ -224,7 +224,7 @@ class Sage_SamplerInfo:
     FUNCTION = "pass_info"
 
     CATEGORY = "Sage Utils"
-    DESCRIPTION = "Grabs most of the sampler info and passes it along."
+    DESCRIPTION = "Grabs most of the sampler info and passes it to the custom KSampler in this node pack."
 
     def pass_info(self, seed, steps, cfg, sampler_name, scheduler):
         s_info = {}
@@ -254,7 +254,7 @@ class Sage_KSampler:
     FUNCTION = "sample"
 
     CATEGORY = "Sage Utils"
-    DESCRIPTION = "Uses the provided model, positive and negative conditioning to denoise the latent image."
+    DESCRIPTION = "Uses the provided model, positive and negative conditioning to denoise the latent image. Designed to work with the Sampler info node."
 
     def sample(self, model, sampler_info, positive, negative, latent_image, denoise=1.0):
         return nodes.common_ksampler(model, sampler_info["seed"], sampler_info["steps"], sampler_info["cfg"], sampler_info["sampler"], sampler_info["scheduler"], positive, negative, latent_image, denoise=denoise)
@@ -284,7 +284,7 @@ class Sage_ConstructMetadata:
     FUNCTION = "construct_metadata"
     
     CATEGORY = "Sage Utils"
-    DESCRIPTION = "Puts together metadata from data provided by other nodes in Sage Utils."
+    DESCRIPTION = "Puts together metadata in a A1111-like format. Uses the custom sampler info node. The return value is a string, so can be manipulated by other nodes."
     
     def lora_to_prompt(self, lora_stack = None):
         lora_info = ''
@@ -359,7 +359,7 @@ class Sage_CheckpointLoaderSimple:
     FUNCTION = "load_checkpoint"
 
     CATEGORY  =  "Sage Utils"
-    DESCRIPTION = "Loads a diffusion model checkpoint, diffusion models are used to denoise latents."
+    DESCRIPTION = "Loads a diffusion model checkpoint. Also returns a model_info output to pass to the construct metadata node, and the hash. (And hashes and pulls civitai info for the file.)"
 
     def load_checkpoint(self, ckpt_name):
         model_info = { "full_name": ckpt_name }
@@ -388,6 +388,8 @@ class Sage_LoraStackDebugString:
     
     FUNCTION = "output_value"
     CATEGORY = "Sage Utils/Debug"
+    DESCRIPTION = "Prints out what is in the lora_stack as a string."
+
     
     def output_value(self, lora_stack):
         return (f"{lora_stack}",)
@@ -416,6 +418,7 @@ class Sage_LoraStack:
     
     FUNCTION = "add_lora_to_stack"
     CATEGORY = "Sage Utils"
+    DESCRIPTION = "Choose a lora with weights, and add it to a lora_stack. Compatable with other node packs that have lora_stacks."
     
     def add_lora_to_stack(self, lora_name, model_weight, clip_weight, lora_stack = None):
         lora = (lora_name, model_weight, clip_weight)
@@ -452,7 +455,7 @@ class Sage_LoraStackLoader:
     FUNCTION = "load_loras"
 
     CATEGORY = "Sage Utils"
-    DESCRIPTION = "LoRAs are used to modify diffusion and CLIP models, altering the way in which latents are denoised such as applying styles. Multiple LoRA nodes can be linked together."
+    DESCRIPTION = "Accept a lora_stack with Model and Clip, and apply all the loras in the stack at once."
 
     def load_lora(self, model, clip, lora_name, strength_model, strength_clip):
         if strength_model == 0 and strength_clip == 0:
@@ -516,7 +519,7 @@ class Sage_SaveImageWithMetadata:
     OUTPUT_NODE = True
 
     CATEGORY = "Sage Utils"
-    DESCRIPTION = "Saves the input images to your ComfyUI output directory with added metadata. The param_metadata input should come from Construct Metadata, and the extra_metadata is anything you want."
+    DESCRIPTION = "Saves the input images to your ComfyUI output directory with added metadata. The param_metadata input should come from Construct Metadata, and the extra_metadata is anything you want. Both are just strings, though, with the difference being that the first has a keyword of parameters, and the second, extra, so technically you could pass in your own metadata, or even type it in in a Set Text node and hook that to this node."
 
     def set_metadata(self, include_node_metadata, include_extra_pnginfo_metadata, param_metadata = None, extra_metadata=None, prompt=None, extra_pnginfo=None):
         result = None
