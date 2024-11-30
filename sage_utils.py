@@ -15,6 +15,7 @@ def get_civitai_json(hash):
 
 def pull_metadata(file_path):
     cache.load_cache()
+    print(f"Pull metadata for {file_path}.")
     hash = ""
 
     if file_path in cache.cache_data:
@@ -28,14 +29,21 @@ def pull_metadata(file_path):
     
     try:
         json = get_civitai_json(hash)
-
-        cache.cache_data[file_path]["model"] = json["model"]
-        cache.cache_data[file_path]["name"] = json["name"]
-        cache.cache_data[file_path]["baseModel"] = json["baseModel"]
-        cache.cache_data[file_path]["id"] = json["id"]
-        cache.cache_data[file_path]["modelId"] = json["modelId"]
-        cache.cache_data[file_path]["trainedWords"] = json["trainedWords"]
-        cache.cache_data[file_path]["downloadUrl"] = json["downloadUrl"]
+        if 'error' in json:
+            if 'model' in json:
+                print("Error: " + str(json["error"]))
+            else:
+                print("Error: " + str(json["error"]))
+                cache.cache_data[file_path]['civitai'] = "False"
+        else:
+            cache.cache_data[file_path]['civitai'] = "True"
+            cache.cache_data[file_path]["model"] = json["model"]
+            cache.cache_data[file_path]["name"] = json["name"]
+            cache.cache_data[file_path]["baseModel"] = json["baseModel"]
+            cache.cache_data[file_path]["id"] = json["id"]
+            cache.cache_data[file_path]["modelId"] = json["modelId"]
+            cache.cache_data[file_path]["trainedWords"] = json["trainedWords"]
+            cache.cache_data[file_path]["downloadUrl"] = json["downloadUrl"]
 
     except:
         print(f"Failed to pull metadata for {file_path} with hash {hash}")
