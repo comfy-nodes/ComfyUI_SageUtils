@@ -296,14 +296,14 @@ class Sage_ConstructMetadata:
         return lora_info
     
     def get_model_info(self, lora_path, weight):
+        ret = {}
         try:
-            ret = {}
-            ret["type"] = cache.cache__data[lora_path]["model"]["type"]
+            ret["type"] = cache.cache_data[lora_path]["model"]["type"]
             if ret["type"] == "LORA":
                 ret["weight"] = weight
-            ret["modelVersionId"] = cache.cache__data[lora_path]["id"]
-            ret["modelName"] = cache.cache__data[lora_path]["model"]["name"]
-            ret["modelVersionName"] = cache.cache__data[lora_path]["name"]
+            ret["modelVersionId"] = cache.cache_data[lora_path]["id"]
+            ret["modelName"] = cache.cache_data[lora_path]["model"]["name"]
+            ret["modelVersionName"] = cache.cache_data[lora_path]["name"]
         except:
             ret = {}
         return ret
