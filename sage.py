@@ -3,6 +3,7 @@ import os
 import json
 import pathlib
 import numpy as np
+import torch
 
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
@@ -15,7 +16,6 @@ import nodes
 
 from .sage_utils import *
 import ComfyUI_SageUtils.sage_cache as cache
-
 
 class Sage_CollectKeywordsFromLoraStack:
     @classmethod
@@ -178,30 +178,51 @@ class Sage_DualCLIPTextEncode:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "clip": ("CLIP", {"defaultInput": True, "tooltip": "The CLIP model used for encoding the text."}),
-                "pos": ("STRING", {"defaultInput": True, "default": "score_9, score_8_up, scoure_7_up, score_6_up, score_5_up, score_4_up", "multiline": True, "dynamicPrompts": True, "tooltip": "The positive prompt's text."}), 
-                "neg": ("STRING", {"defaultInput": True, "default": "signature, watermark", "multiline": True, "dynamicPrompts": True, "tooltip": "The negative prompt's text."})
+                "clip": ("CLIP", {"defaultInput": True, "tooltip": "The CLIP model used for encoding the text."})
+            },
+            "optional": {
+                "pos": ("STRING", {"defaultInput": True, "multiline": True, "dynamicPrompts": True, "tooltip": "The positive prompt's text."}), 
+                "neg": ("STRING", {"defaultInput": True, "multiline": True, "dynamicPrompts": True, "tooltip": "The negative prompt's text."}),
             }
         }
     RETURN_TYPES = ("CONDITIONING", "CONDITIONING", "STRING", "STRING")
     RETURN_NAMES = ("pos_cond", "neg_cond", "pos_text", "neg_text")
     
-    OUTPUT_TOOLTIPS = ("A conditioning containing the embedded text used to guide the diffusion model.",)
+    OUTPUT_TOOLTIPS = ("A conditioning containing the embedded text used to guide the diffusion model. If neg is not hooked up, it'll be automatically zeroed.",)
     FUNCTION = "encode"
 
     CATEGORY = "Sage Utils"
-    DESCRIPTION = "Turns a positive and negative prompt into conditionings, and passes through the prompts. Saves space over two CLIP Text Encoders."
+    DESCRIPTION = "Turns a positive and negative prompt into conditionings, and passes through the prompts. Saves space over two CLIP Text Encoders, and zeros any input not hooked up."
 
-    def encode(self, clip, pos, neg):
-        pos_tokens = clip.tokenize(pos)
-        pos_output = clip.encode_from_tokens(pos_tokens, return_pooled=True, return_dict=True)
-        pos_cond = pos_output.pop("cond")
+    def get_conditioning(self, clip, text = None):
+        zero_text = False
+        if text == None:
+            zero_text = True
+            text = ""
+
+        tokens = clip.tokenize(text)
+        output = clip.encode_from_tokens(tokens, return_pooled=True, return_dict=True)
+        cond = output.pop("cond")
+
+        if zero_text == True:
+            pooled_output = output.get("pooled_output", None)
+            if pooled_output is not None:
+                output["pooled_output"] = torch.zeros_like(pooled_output)
+            return ([[torch.zeros_like(cond), output]])
+            
+        return ([[cond, output]])
+
+    def encode(self, clip, pos = None, neg = None):
+        ret_pos = ""
+        ret_neg = ""
+
+        if pos != None:
+            ret_pos = pos
         
-        neg_tokens = clip.tokenize(neg)
-        neg_output = clip.encode_from_tokens(neg_tokens, return_pooled=True, return_dict=True)
-        neg_cond = neg_output.pop("cond")
-        
-        return ([[pos_cond, pos_output]], [[neg_cond, neg_output]], pos, neg)
+        if neg != None:
+            ret_neg = neg
+
+        return (self.get_conditioning(clip, pos), self.get_conditioning(clip, neg), ret_pos, ret_neg)
 
 class Sage_SamplerInfo:
     def __init__(self):
