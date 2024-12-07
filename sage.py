@@ -311,7 +311,9 @@ class Sage_ConstructMetadata:
     def construct_metadata(self, model_info, positive_string, negative_string, width, height, sampler_info, lora_stack = None):
         metadata = ''
         resource_hashes = []
-        lora_hashes = ''
+        lora_hashes = []
+        lora_hash_string = ''
+        civitai_string = ''
         
         sampler_name = civitai_sampler_name(sampler_info['sampler'], sampler_info['scheduler'])
         
@@ -325,17 +327,21 @@ class Sage_ConstructMetadata:
                 lora_path = folder_paths.get_full_path_or_raise("loras", lora[0])
                 lora_name = str(pathlib.Path(lora_path).name)
                 pull_metadata(lora_path)
-                lora_hash = cache.cache_data[lora_path]["hash"]
                 lora_data = get_model_info(lora_path, lora[1])
                 if lora_data != {}:
                     resource_hashes.append(lora_data)
-                lora_hashes += f"{lora_name}: {lora_hash},"
+                
+                lora_hash = cache.cache_data[lora_path]["hash"]
+                lora_hashes += [f"{lora_name}: {lora_hash}"]
         
+        lora_hash_string = "Lora hashes: " + ",".join(lora_hashes)
+        civitai_string = f"Civitai resources: {json.dumps(resource_hashes)}"
+
         metadata = f"{positive_string} {lora_to_prompt(lora_stack)}" + "\n" 
         if negative_string != "":
             metadata += f"Negative prompt: {negative_string}" + "\n"
         metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height},"
-        metadata += f"Model: {model_info['name']}, Model hash: {model_info['hash']}, Version: v1.10-RC-6-comfyui, Civitai resources: {json.dumps(resource_hashes)}, Lora hashes: {lora_hashes}"
+        metadata += f"Model: {model_info['name']}, Model hash: {model_info['hash']}, Version: v1.10-RC-6-comfyui, {civitai_string}, {lora_hash_string}"
         return metadata,
 
 class Sage_CheckpointLoaderSimple:
