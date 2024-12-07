@@ -431,6 +431,37 @@ class Sage_CheckpointLoaderSimple:
         result = (*out[:3], model_info, model_info["hash"])
         return (result)
  
+class Sage_UNETLoader:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { "unet_name": (folder_paths.get_filename_list("diffusion_models"), ),
+                              "weight_dtype": (["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"],)
+                             }}
+    RETURN_TYPES = ("MODEL", "MODEL_INFO", "STRING")
+    RETURN_NAMES = ("model", "model_info", "hash")
+
+    FUNCTION = "load_unet"
+    CATEGORY  =  "Sage Utils"
+
+    def load_unet(self, unet_name, weight_dtype):
+        model_options = {}
+        if weight_dtype == "fp8_e4m3fn":
+            model_options["dtype"] = torch.float8_e4m3fn
+        elif weight_dtype == "fp8_e4m3fn_fast":
+            model_options["dtype"] = torch.float8_e4m3fn
+            model_options["fp8_optimizations"] = True
+        elif weight_dtype == "fp8_e5m2":
+            model_options["dtype"] = torch.float8_e5m2
+
+        model_info = { "full_name": unet_name }
+        model_info["path"] = folder_paths.get_full_path_or_raise("diffusion_models", unet_name)
+        model_info["name"] = pathlib.Path(model_info["full_name"]).name
+        pull_metadata(model_info["path"], True)
+        model_info["hash"] = cache.cache_data[model_info["path"]]["hash"]
+
+        model = comfy.sd.load_diffusion_model(model_info["path"], model_options=model_options)
+        return (model,model_info, model_info["hash"])
+    
 class Sage_LoraStackDebugString:
     def __init__(self):
          pass
@@ -453,7 +484,30 @@ class Sage_LoraStackDebugString:
     def output_value(self, lora_stack):
         return (f"{lora_stack}",)
     
-     
+class Sage_LoraHookToStack:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "prev_hooks": ("HOOKS",{"defaultInput": False})
+            }
+        }
+    
+    RETURN_TYPES = ("HOOKS", "LORA_STACK")
+    RETURN_NAMES = ("hooks", "lora_stack",)
+    
+    FUNCTION = "new_stack"
+    CATEGORY = "Sage Utils"
+    DESCRIPTION = "Copies the lora information from the hook and returns it as a stack."
+
+    def new_stack(self, prev_hooks):
+        lora_stack = ()
+        for hook in prev_hooks:
+            lora_stack.append(hook.lora[0], hook.strength_model, hook.strength_clip)
+        return (prev_hooks, lora_stack)
  
 class Sage_LoraStack:
     def __init__(self):
