@@ -13,8 +13,8 @@ class Sage_SetInteger:
     RETURN_NAMES = ("int",)
     
     FUNCTION = "pass_int"
-    
-    CATEGORY = "Sage Utils/Primitives"
+
+    CATEGORY = "Sage Utils/primitives"
     DESCRIPTION = "Sets an integer."
     
     def pass_int(self, int):
@@ -34,7 +34,7 @@ class Sage_SetFloat:
     
     FUNCTION = "pass_float"
     
-    CATEGORY = "Sage Utils/Primitives"
+    CATEGORY = "Sage Utils/primitives"
     DESCRIPTION = "Sets an float."
     
     def pass_float(self, float):
@@ -54,7 +54,7 @@ class Sage_SetText:
     
     FUNCTION = "pass_str"
     
-    CATEGORY = "Sage Utils/Primitives"
+    CATEGORY = "Sage Utils/primitives"
     DESCRIPTION = "Sets some text."
     
     def pass_str(self, str):
@@ -76,7 +76,7 @@ class Sage_JoinText:
     
     FUNCTION = "join_str"
     
-    CATEGORY = "Sage Utils/Primitives"
+    CATEGORY = "Sage Utils/primitives"
     DESCRIPTION = "Joins two strings with a separator."
     
     def join_str(self, separator, str1, str2):
@@ -97,7 +97,7 @@ class Sage_ViewText:
     
     FUNCTION = "show_str"
     
-    CATEGORY = "Sage Utils/Primitives"
+    CATEGORY = "Sage Utils/primitives"
     DESCRIPTION = "Shows some text."
     OUTPUT_NODE = True
     INPUT_IS_LIST = (True,)
@@ -120,7 +120,7 @@ class Sage_PonyPrefix:
 
     FUNCTION = "create_prefix"
 
-    CATEGORY = "Sage Utils/Util"
+    CATEGORY = "Sage Utils/util"
 
     def create_prefix(self, rating, source, prompt):
         return (f"score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, source_{source}, rating_{rating}, {prompt}",)
@@ -137,7 +137,7 @@ class Sage_ConditioningZeroOut:
     RETURN_TYPES = ("CONDITIONING",)
     FUNCTION = "zero_out"
 
-    CATEGORY = "Sage Utils/Primitives"
+    CATEGORY = "Sage Utils/primitives"
     DESCRIPTION = "Returns zeroed out conditioning."
 
     def zero_out(self, clip):

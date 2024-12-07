@@ -32,7 +32,7 @@ class Sage_CollectKeywordsFromLoraStack:
 
     FUNCTION = "get_keywords"
 
-    CATEGORY = "Sage Utils/Util"
+    CATEGORY = "Sage Utils/util"
     DESCRIPTION = "Go through each model in the lora stack, grab any keywords from civitai, and combine them into one string. Place at the end of a lora_stack, or you won't get keywords for the entire stack."
 
     def get_keywords(self, lora_stack):
@@ -70,7 +70,7 @@ class Sage_GetInfoFromHash:
 
     FUNCTION = "get_info"
     
-    CATEGORY = "Sage Utils/Util"
+    CATEGORY = "Sage Utils/util"
     DESCRIPTION = "Pull out various useful pieces of information from a hash, such as the model and version id, the model name and version, what model it's based on, and what keywords it has."
 
     def get_info(self, hash):
@@ -90,11 +90,11 @@ class Sage_GetInfoFromHash:
             if words == []:
                 ret.append("")
             else:
-                ret.append(",".join(words))
+                ret.append(", ".join(words))
             ret.append(json["downloadUrl"])
         except:
             print("Exception when getting json data.")
-            ret = ["0", "1", "2", "3", "4", "5", "6", "7"]
+            ret = ["", "", "", "", "", "", "", ""]
         
         return (ret[0], ret[1], ret[2], ret[3], ret[4], ret[5], ret[6], ret[7],)
 
@@ -112,7 +112,7 @@ class Sage_IterOverFiles:
     
     FUNCTION = "get_files"
     
-    CATEGORY = "Sage Utils/Util"
+    CATEGORY = "Sage Utils/util"
     DESCRIPTION = "Calculates the hash of every model in the chosen directory and pulls civitai information. Takes forever. Returns the filenames."
     
     def get_files(self, base_dir):
@@ -135,7 +135,7 @@ class Sage_GetFileHash:
     
     FUNCTION = "get_hash"
     
-    CATEGORY = "Sage Utils/Util"
+    CATEGORY = "Sage Utils/util"
     DESCRIPTION = "Get an sha256 hash of a file. Can be used for detecting models, civitai calls and such."
     
     def get_hash(self, base_dir, filename):
@@ -163,7 +163,7 @@ class Sage_GetModelJSONFromHash:
     RETURN_TYPES = ("STRING",)
     
     FUNCTION = "pull_json"
-    CATEGORY = "Sage Utils/Util"
+    CATEGORY = "Sage Utils/util"
     DESCRIPTION = "Returns the JSON that civitai will give you, based on a hash. Useful if you want to see all the information, just what I'm using. This is the specific version hash."
 
     def pull_json(self, hash):
@@ -192,7 +192,7 @@ class Sage_DualCLIPTextEncode:
     OUTPUT_TOOLTIPS = ("A conditioning containing the embedded text used to guide the diffusion model. If neg is not hooked up, it'll be automatically zeroed.",)
     FUNCTION = "encode"
 
-    CATEGORY = "Sage Utils"
+    CATEGORY = "Sage Utils/clip"
     DESCRIPTION = "Turns a positive and negative prompt into conditionings, and passes through the prompts. Saves space over two CLIP Text Encoders, and zeros any input not hooked up."
 
     def get_conditioning(self, clip, text = None):
@@ -245,7 +245,7 @@ class Sage_SamplerInfo:
     OUTPUT_TOOLTIPS = ("To be piped to the Construct Metadata node.",)
     FUNCTION = "pass_info"
 
-    CATEGORY = "Sage Utils"
+    CATEGORY = "Sage Utils/metadata"
     DESCRIPTION = "Grabs most of the sampler info and passes it to the custom KSampler in this node pack."
 
     def pass_info(self, seed, steps, cfg, sampler_name, scheduler):
@@ -305,7 +305,7 @@ class Sage_ConstructMetadata:
     RETURN_NAMES = ('param_metadata',)
     FUNCTION = "construct_metadata"
     
-    CATEGORY = "Sage Utils"
+    CATEGORY = "Sage Utils/metadata"
     DESCRIPTION = "Puts together metadata in a A1111-like format. Uses the custom sampler info node. The return value is a string, so can be manipulated by other nodes."
     
     def construct_metadata(self, model_info, positive_string, negative_string, width, height, sampler_info, lora_stack = None):
@@ -369,7 +369,7 @@ class Sage_ConstructMetadataLite:
     RETURN_NAMES = ('param_metadata',)
     FUNCTION = "construct_metadata"
     
-    CATEGORY = "Sage Utils"
+    CATEGORY = "Sage Utils/metadata"
     DESCRIPTION = "Puts together metadata in a A1111-like format. Uses the custom sampler info node. The return value is a string, so can be manipulated by other nodes."
     
     def construct_metadata(self, model_info, positive_string, negative_string, width, height, sampler_info, lora_stack = None):
@@ -416,7 +416,7 @@ class Sage_CheckpointLoaderSimple:
                        "The hash of the model")
     FUNCTION = "load_checkpoint"
 
-    CATEGORY  =  "Sage Utils"
+    CATEGORY  =  "Sage Utils/loaders"
     DESCRIPTION = "Loads a diffusion model checkpoint. Also returns a model_info output to pass to the construct metadata node, and the hash. (And hashes and pulls civitai info for the file.)"
 
     def load_checkpoint(self, ckpt_name):
@@ -441,7 +441,7 @@ class Sage_UNETLoader:
     RETURN_NAMES = ("model", "model_info", "hash")
 
     FUNCTION = "load_unet"
-    CATEGORY  =  "Sage Utils"
+    CATEGORY  =  "Sage Utils/loaders"
 
     def load_unet(self, unet_name, weight_dtype):
         model_options = {}
@@ -461,53 +461,6 @@ class Sage_UNETLoader:
 
         model = comfy.sd.load_diffusion_model(model_info["path"], model_options=model_options)
         return (model,model_info, model_info["hash"])
-    
-class Sage_LoraStackDebugString:
-    def __init__(self):
-         pass
-     
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "lora_stack": ("LORA_STACK", {"defaultInput": True}),
-                },
-        }
-    
-    RETURN_TYPES = ("STRING",)
-    
-    FUNCTION = "output_value"
-    CATEGORY = "Sage Utils/Debug"
-    DESCRIPTION = "Prints out what is in the lora_stack as a string."
-
-    
-    def output_value(self, lora_stack):
-        return (f"{lora_stack}",)
-    
-class Sage_LoraHookToStack:
-    def __init__(self):
-        pass
-
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "prev_hooks": ("HOOKS",{"defaultInput": False})
-            }
-        }
-    
-    RETURN_TYPES = ("HOOKS", "LORA_STACK")
-    RETURN_NAMES = ("hooks", "lora_stack",)
-    
-    FUNCTION = "new_stack"
-    CATEGORY = "Sage Utils"
-    DESCRIPTION = "Copies the lora information from the hook and returns it as a stack."
-
-    def new_stack(self, prev_hooks):
-        lora_stack = ()
-        for hook in prev_hooks:
-            lora_stack.append(hook.lora[0], hook.strength_model, hook.strength_clip)
-        return (prev_hooks, lora_stack)
  
 class Sage_LoraStack:
     def __init__(self):
@@ -530,7 +483,7 @@ class Sage_LoraStack:
     RETURN_NAMES = ("lora_stack",)
     
     FUNCTION = "add_lora_to_stack"
-    CATEGORY = "Sage Utils"
+    CATEGORY = "Sage Utils/lora"
     DESCRIPTION = "Choose a lora with weights, and add it to a lora_stack. Compatable with other node packs that have lora_stacks."
     
     def add_lora_to_stack(self, lora_name, model_weight, clip_weight, lora_stack = None):
@@ -567,7 +520,7 @@ class Sage_LoraStackLoader:
     OUTPUT_TOOLTIPS = ("The modified diffusion model.", "The modified CLIP model.", "The stack of loras.")
     FUNCTION = "load_loras"
 
-    CATEGORY = "Sage Utils"
+    CATEGORY = "Sage Utils/loaders"
     DESCRIPTION = "Accept a lora_stack with Model and Clip, and apply all the loras in the stack at once."
 
     def load_lora(self, model, clip, lora_name, strength_model, strength_clip):
