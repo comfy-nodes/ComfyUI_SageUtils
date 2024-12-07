@@ -7,6 +7,7 @@ import folder_paths
 import json
 import comfy.utils
 import time
+import datetime
 
 import ComfyUI_SageUtils.sage_cache as cache
 
@@ -35,7 +36,7 @@ def get_file_sha256(path):
     print(f"Got hash {result}")
     return result
 
-def pull_metadata(file_path):
+def pull_metadata(file_path, timestamp = False):
     cache.load_cache()
     print(f"Pull metadata for {file_path}.")
     hash = ""
@@ -75,6 +76,8 @@ def pull_metadata(file_path):
         if 'civitai' not in cache.cache_data[file_path]:
             cache.cache_data[file_path]['civitai'] = "False"
 
+    if timestamp == True:
+        cache.cache_data[file_path]['lastUsed'] = datetime.datetime.now().isoformat()
     cache.save_cache()
 
 def lora_to_string(lora_name, model_weight, clip_weight):

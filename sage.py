@@ -4,6 +4,7 @@ import json
 import pathlib
 import numpy as np
 import torch
+import datetime
 
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
@@ -386,7 +387,8 @@ class Sage_CheckpointLoaderSimple:
         model_info = { "full_name": ckpt_name }
         model_info["path"] = folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
         model_info["name"] = pathlib.Path(model_info["full_name"]).name
-        pull_metadata(model_info["path"])
+        pull_metadata(model_info["path"], True)
+
         model_info["hash"] = cache.cache_data[model_info["path"]]["hash"]
     
         out = comfy.sd.load_checkpoint_guess_config(model_info["path"], output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
@@ -483,6 +485,7 @@ class Sage_LoraStackLoader:
             return (model, clip)
 
         lora_path = folder_paths.get_full_path_or_raise("loras", lora_name)
+        
         lora = None
         if self.loaded_lora is not None:
             if self.loaded_lora[0] == lora_path:
@@ -493,10 +496,12 @@ class Sage_LoraStackLoader:
                 del temp
 
         if lora is None:
+            pull_metadata(lora_path, True)
             lora = comfy.utils.load_torch_file(lora_path, safe_load=True)
             self.loaded_lora = (lora_path, lora)
 
         model_lora, clip_lora = comfy.sd.load_lora_for_models(model, clip, lora, strength_model, strength_clip)
+
         return (model_lora, clip_lora)
     
     def load_loras(self, model, clip, lora_stack = None):
