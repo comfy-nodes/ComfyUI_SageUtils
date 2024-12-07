@@ -85,12 +85,34 @@ def lora_to_string(lora_name, model_weight, clip_weight):
         
     return lora_string
 
+def lora_to_prompt(lora_stack = None):
+    lora_info = ''
+    if lora_stack is None:
+        return ""
+    else:
+        for lora in lora_stack:
+            lora_info += lora_to_string(lora[0], lora[1], lora[2])
+    return lora_info
+    
 def get_lora_hash(lora_name):
     lora_path = folder_paths.get_full_path_or_raise("loras", lora_name)
     pull_metadata(lora_path)
 
     return cache.cache_data[lora_path]["hash"]
 
+def get_model_info(lora_path, weight):
+    ret = {}
+    try:
+        ret["type"] = cache.cache_data[lora_path]["model"]["type"]
+        if ret["type"] == "LORA":
+            ret["weight"] = weight
+        ret["modelVersionId"] = cache.cache_data[lora_path]["id"]
+        ret["modelName"] = cache.cache_data[lora_path]["model"]["name"]
+        ret["modelVersionName"] = cache.cache_data[lora_path]["name"]
+    except:
+        ret = {}
+    return ret
+    
 def pull_all_loras(the_path):
     the_paths = the_path[0]
     ret = []

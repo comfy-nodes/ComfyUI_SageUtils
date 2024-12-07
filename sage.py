@@ -308,28 +308,6 @@ class Sage_ConstructMetadata:
     CATEGORY = "Sage Utils"
     DESCRIPTION = "Puts together metadata in a A1111-like format. Uses the custom sampler info node. The return value is a string, so can be manipulated by other nodes."
     
-    def lora_to_prompt(self, lora_stack = None):
-        lora_info = ''
-        if lora_stack is None:
-            return ""
-        else:
-            for lora in lora_stack:
-                lora_info += lora_to_string(lora[0], lora[1], lora[2])
-        return lora_info
-    
-    def get_model_info(self, lora_path, weight):
-        ret = {}
-        try:
-            ret["type"] = cache.cache_data[lora_path]["model"]["type"]
-            if ret["type"] == "LORA":
-                ret["weight"] = weight
-            ret["modelVersionId"] = cache.cache_data[lora_path]["id"]
-            ret["modelName"] = cache.cache_data[lora_path]["model"]["name"]
-            ret["modelVersionName"] = cache.cache_data[lora_path]["name"]
-        except:
-            ret = {}
-        return ret
-    
     def construct_metadata(self, model_info, positive_string, negative_string, width, height, sampler_info, lora_stack = None):
         metadata = ''
         resource_hashes = []
@@ -348,12 +326,12 @@ class Sage_ConstructMetadata:
                 lora_name = str(pathlib.Path(lora_path).name)
                 pull_metadata(lora_path)
                 lora_hash = cache.cache_data[lora_path]["hash"]
-                lora_data = self.get_model_info(lora_path, lora[1])
+                lora_data = get_model_info(lora_path, lora[1])
                 if lora_data != {}:
                     resource_hashes.append(lora_data)
                 lora_hashes += f"{lora_name}: {lora_hash},"
         
-        metadata = f"{positive_string} {self.lora_to_prompt(lora_stack)}" + "\n" 
+        metadata = f"{positive_string} {lora_to_prompt(lora_stack)}" + "\n" 
         if negative_string != "":
             metadata += f"Negative prompt: {negative_string}" + "\n"
         metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height},"
