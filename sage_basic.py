@@ -110,9 +110,10 @@ class Sage_PonyPrefix:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "add_score": ("BOOLEAN", {"defaultInput": False}),
                 "rating": (["safe", "questionable", "explicit"], {"defaultInput": False}),
                 "source": (["pony", "furry", "anime", "cartoon"], {"defaultInput": False}),
-                "prompt": ("STRING", {"defaultInput": False, "multiline": True})
+                "prompt": ("STRING", {"defaultInput": True, "multiline": True})
             }
         }
 
@@ -122,8 +123,12 @@ class Sage_PonyPrefix:
 
     CATEGORY = "Sage Utils/util"
 
-    def create_prefix(self, rating, source, prompt):
-        return (f"score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, source_{source}, rating_{rating}, {prompt}",)
+    def create_prefix(self, add_score, rating, source, prompt):
+        prefix = ""
+        if add_score == True:
+            prefix += "score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, "
+        prefix += f"source_{source}, rating_{rating}, {prompt}"
+        return (prefix,)
 
 class Sage_ConditioningZeroOut:
     @classmethod
