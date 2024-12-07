@@ -100,11 +100,11 @@ def get_lora_hash(lora_name):
 
     return cache.cache_data[lora_path]["hash"]
 
-def get_model_info(lora_path, weight):
+def get_model_info(lora_path, weight = None):
     ret = {}
     try:
         ret["type"] = cache.cache_data[lora_path]["model"]["type"]
-        if ret["type"] == "LORA":
+        if (ret["type"] == "LORA") and (weight is not None):
             ret["weight"] = weight
         ret["modelVersionId"] = cache.cache_data[lora_path]["id"]
         ret["modelName"] = cache.cache_data[lora_path]["model"]["name"]
