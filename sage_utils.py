@@ -30,8 +30,10 @@ def get_civitai_json(hash):
 def get_file_sha256(path):
     print(f"Calculating hash for {path}")
     m = hashlib.sha256()
+    
     with open(path, 'rb') as f:
         m.update(f.read())
+        
     result = str(m.digest().hex()[:10])
     print(f"Got hash {result}")
     return result

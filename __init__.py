@@ -3,6 +3,7 @@ import ComfyUI_SageUtils.sage_utils
 
 from .sage import *
 from .sage_basic import *
+from .sage_loaders import *
 
 # A dictionary that contains all nodes you want to export with their names
 # NOTE: names should be globally unique
@@ -17,6 +18,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_GetInfoFromHash": Sage_GetInfoFromHash,
     "Sage_GetModelJSONFromHash": Sage_GetModelJSONFromHash,
     "Sage_CollectKeywordsFromLoraStack": Sage_CollectKeywordsFromLoraStack,
+    "Sage_LoadImage": Sage_LoadImage,
     "Sage_UNETLoader": Sage_UNETLoader,
     "Sage_CheckpointLoaderSimple": Sage_CheckpointLoaderSimple,
     "Sage_LoraStack": Sage_LoraStack,
@@ -43,8 +45,9 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_GetInfoFromHash": "Get Model Info From Hash",
     "Sage_GetModelJSONFromHash": "Get Model JSON From Hash",
     "Sage_CollectKeywordsFromLoraStack": "Lora Stack -> Keywords",
-    "Sage_UNETLoader": "Load Diffusion Model With Name",
-    "Sage_CheckpointLoaderSimple": "Load Checkpoint With Name",
+    "Sage_LoadImage": "Load Image with Size and Metadata",
+    "Sage_UNETLoader": "Load Diffusion Model With Metadata",
+    "Sage_CheckpointLoaderSimple": "Load Checkpoint With Metadata",
     "Sage_LoraStack":   "Simple Lora Stack",
     "Sage_LoraStackLoader": "Lora Stack Loader",
     "Sage_DualCLIPTextEncode": "Prompts to CLIP",
