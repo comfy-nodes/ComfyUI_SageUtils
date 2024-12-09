@@ -4,7 +4,7 @@ from .sage_utils import *
 import ComfyUI_SageUtils.sage_cache as cache
 
 import torch
-import os
+import pathlib
 import numpy as np
 from PIL import Image, ImageOps, ImageSequence
 from PIL.PngImagePlugin import PngInfo
@@ -141,7 +141,8 @@ class Sage_LoadImage:
     @classmethod
     def INPUT_TYPES(s):
         input_dir = folder_paths.get_input_directory()
-        files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
+        p = pathlib.Path(input_dir).glob('**/*')
+        files = [str(x.relative_to(input_dir)) for x in p if x.is_file()]
         return {"required":
                     {"image": (sorted(files), {"image_upload": True})},
                 }
