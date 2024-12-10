@@ -23,7 +23,7 @@ def get_civitai_json(hash):
         print(f"Other error occurred: {err}")
         return {"error": "Other error occurred: " + err}
     else:
-        print("Success!")
+        print("Retrieved json from civitai.")
         return r.json()
 
     return r.json()

@@ -5,6 +5,8 @@ from .sage import *
 from .sage_basic import *
 from .sage_loaders import *
 
+sage_cache.load_cache()
+
 # A dictionary that contains all nodes you want to export with their names
 # NOTE: names should be globally unique
 NODE_CLASS_MAPPINGS = {
