@@ -55,24 +55,30 @@ def pull_metadata(file_path, timestamp = False):
         hash = cache.cache_data[file_path]["hash"]
     
     try:
-        json = get_civitai_json(hash)
-        if 'error' in json:
-            print("Error: " + str(json["error"]))
-            if 'model' in cache.cache_data[file_path]:
-                if 'civitai' not in cache.cache_data[file_path]:
-                    cache.cache_data[file_path]['civitai'] = "False"
+        if 'lastUsed' in cache.cache_data[file_path]:
+            last = cache.cache_data[file_path]['lastUsed']
+            last_used = datetime.datetime.fromisoformat(last)
+            if (datetime.datetime.now() - last_used).days == 0:
+                print("Pulled earlier today. No pull needed.")
             else:
-                cache.cache_data[file_path]['civitai'] = "False"
-        else:
-            cache.cache_data[file_path]['civitai'] = "True"
-            cache.cache_data[file_path]["model"] = json["model"]
-            cache.cache_data[file_path]["name"] = json["name"]
-            cache.cache_data[file_path]["baseModel"] = json["baseModel"]
-            cache.cache_data[file_path]["id"] = json["id"]
-            cache.cache_data[file_path]["modelId"] = json["modelId"]
-            cache.cache_data[file_path]["trainedWords"] = json["trainedWords"]
-            cache.cache_data[file_path]["downloadUrl"] = json["downloadUrl"]
-            print("Successfully pulled metadata.")
+                json = get_civitai_json(hash)
+                if 'error' in json:
+                    print("Error: " + str(json["error"]))
+                    if 'model' in cache.cache_data[file_path]:
+                        if 'civitai' not in cache.cache_data[file_path]:
+                            cache.cache_data[file_path]['civitai'] = "False"
+                    else:
+                        cache.cache_data[file_path]['civitai'] = "False"
+                else:
+                    cache.cache_data[file_path]['civitai'] = "True"
+                    cache.cache_data[file_path]["model"] = json["model"]
+                    cache.cache_data[file_path]["name"] = json["name"]
+                    cache.cache_data[file_path]["baseModel"] = json["baseModel"]
+                    cache.cache_data[file_path]["id"] = json["id"]
+                    cache.cache_data[file_path]["modelId"] = json["modelId"]
+                    cache.cache_data[file_path]["trainedWords"] = json["trainedWords"]
+                    cache.cache_data[file_path]["downloadUrl"] = json["downloadUrl"]
+                    print("Successfully pulled metadata.")
 
     except:
         print(f"Failed to pull metadata for {file_path} with hash {hash}")
