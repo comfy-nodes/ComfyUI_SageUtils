@@ -1,5 +1,25 @@
 import torch
 
+class Sage_SetBool:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "bool": ("BOOLEAN", {"defaultInput": False}),
+            }
+        }
+    
+    RETURN_TYPES = ("BOOLEAN",)
+    RETURN_NAMES = ("bool",)
+    
+    FUNCTION = "pass_bool"
+
+    CATEGORY = "Sage Utils/primitives"
+    DESCRIPTION = "Sets an boolean."
+    
+    def pass_bool(self, bool):
+        return (bool,)
+    
 class Sage_SetInteger:
     @classmethod
     def INPUT_TYPES(s):

@@ -8,6 +8,7 @@ from .sage_loaders import *
 # A dictionary that contains all nodes you want to export with their names
 # NOTE: names should be globally unique
 NODE_CLASS_MAPPINGS = {
+    "Sage_SetBool": Sage_SetBool,
     "Sage_SetInteger": Sage_SetInteger,
     "Sage_SetFloat": Sage_SetFloat,
     "Sage_SetText": Sage_SetText,
@@ -35,6 +36,7 @@ NODE_CLASS_MAPPINGS = {
  
 # A dictionary that contains the friendly/humanly readable titles for the nodes
 NODE_DISPLAY_NAME_MAPPINGS  = {
+    "Sage_SetBool": "Set Bool",
     "Sage_SetInteger": "Set Integer",
     "Sage_SetFloat": "Set Float",
     "Sage_SetText": "Set Text",
