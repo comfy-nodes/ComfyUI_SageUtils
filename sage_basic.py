@@ -1,4 +1,6 @@
 import torch
+import comfy
+import nodes
 
 class Sage_SetBool:
     @classmethod
@@ -85,7 +87,7 @@ class Sage_JoinText:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "separator": ("STRING", {"defaultInput": False}),
+                "separator": ("STRING", {"defaultInput": False, "default": ', '}),
                 "str1": ("STRING", {"defaultInput": True, "multiline": True}),
                 "str2": ("STRING", {"defaultInput": True, "multiline": True}),
             }
@@ -140,7 +142,6 @@ class Sage_PonyPrefix:
     RETURN_TYPES = ("STRING",)
 
     FUNCTION = "create_prefix"
-
     CATEGORY = "Sage Utils/util"
 
     def create_prefix(self, add_score, rating, source, prompt):
@@ -178,3 +179,35 @@ class Sage_ConditioningZeroOut:
         n = [torch.zeros_like(conditioning), output]
         c.append(n)
         return (c, )
+    
+class Sage_EmptyLatentImagePassthrough:
+    def __init__(self):
+        self.device = comfy.model_management.intermediate_device()
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": { 
+                "width": ("INT", {"defaultInput": True, "default": 1024, "min": 16, "max": nodes.MAX_RESOLUTION, "step": 8, "tooltip": "The width of the latent images in pixels."}),
+                "height": ("INT", {"defaultInput": True, "default": 1024, "min": 16, "max": nodes.MAX_RESOLUTION, "step": 8, "tooltip": "The height of the latent images in pixels."}),
+                "batch_size": ("INT", {"default": 1, "min": 1, "max": 4096, "tooltip": "The number of latent images in the batch."}),
+                "sd3": ("BOOLEAN", {"default": False})
+            }
+        }
+    RETURN_TYPES = ("LATENT", "INT", "INT")
+    RETURN_NAMES = ("latent", "width", "height")
+    OUTPUT_TOOLTIPS = ("The empty latent image batch.", "pass through the image width", "pass through the image height")
+    FUNCTION = "generate"
+
+    CATEGORY = "Sage Utils/util"
+    DESCRIPTION = "Create a new batch of empty latent images to be denoised via sampling."
+
+    def generate(self, width, height, batch_size=1, sd3=False):
+        size = 0
+        if sd3:
+            size = 16
+        else:
+            size = 4
+        latent = torch.zeros([batch_size, size, height // 8, width // 8], device=self.device)
+
+        return ({"samples":latent}, width, height)
