@@ -31,7 +31,7 @@ class Sage_CollectKeywordsFromLoraStack:
 
     FUNCTION = "get_keywords"
 
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/lora"
     DESCRIPTION = "Go through each model in the lora stack, grab any keywords from civitai, and combine them into one string. Place at the end of a lora_stack, or you won't get keywords for the entire stack."
 
     def get_keywords(self, lora_stack):

@@ -67,7 +67,11 @@ class Sage_SetText:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "str": ("STRING", {"defaultInput": False, "multiline": True}),
+                "str": ("STRING", {"defaultInput": False, "multiline": True})
+            },
+            "optional": {
+                "prefix": ("STRING", {"defaultInput": True, "multiline": True}),
+                "suffix": ("STRING", {"defaultInput": True, "multiline": True})
             }
         }
     
@@ -79,8 +83,14 @@ class Sage_SetText:
     CATEGORY = "Sage Utils/primitives"
     DESCRIPTION = "Sets some text."
     
-    def pass_str(self, str):
-        return (str,)
+    def pass_str(self, str, prefix = None, suffix = None):
+        ret = ""
+        if prefix is not None:
+            ret += prefix
+        ret += str
+        if suffix is not None:
+            ret += suffix
+        return (ret,)
 
 class Sage_JoinText:
     @classmethod
@@ -103,6 +113,29 @@ class Sage_JoinText:
     
     def join_str(self, separator, str1, str2):
         return (separator.join([str1, str2]),)
+
+class Sage_TripleJoinText:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "separator": ("STRING", {"defaultInput": False, "default": ', '}),
+                "str1": ("STRING", {"defaultInput": True, "multiline": True}),
+                "str2": ("STRING", {"defaultInput": True, "multiline": True}),
+                "str3": ("STRING", {"defaultInput": True, "multiline": True})
+            }
+        }
+    
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("str",)
+    
+    FUNCTION = "join_str"
+    
+    CATEGORY = "Sage Utils/primitives"
+    DESCRIPTION = "Joins three strings with a separator."
+    
+    def join_str(self, separator, str1, str2, str3):
+        return (separator.join([str1, str2, str3]),)
 
 # Commented out in __init__.py, because it doesn't currently work.
 class Sage_ViewText:
@@ -135,6 +168,8 @@ class Sage_PonyPrefix:
                 "add_score": ("BOOLEAN", {"defaultInput": False}),
                 "rating": (["safe", "questionable", "explicit"], {"defaultInput": False}),
                 "source": (["pony", "furry", "anime", "cartoon"], {"defaultInput": False}),
+            },
+            "optional": {
                 "prompt": ("STRING", {"defaultInput": True, "multiline": True})
             }
         }
@@ -144,11 +179,14 @@ class Sage_PonyPrefix:
     FUNCTION = "create_prefix"
     CATEGORY = "Sage Utils/util"
 
-    def create_prefix(self, add_score, rating, source, prompt):
+    def create_prefix(self, add_score, rating, source, prompt = None):
         prefix = ""
         if add_score == True:
             prefix += "score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, "
-        prefix += f"source_{source}, rating_{rating}, {prompt}"
+        if prompt is None:
+            prefix += f"source_{source}, rating_{rating}"
+        else:
+            prefix += f"source_{source}, rating_{rating}, {prompt}"
         return (prefix,)
 
 class Sage_ConditioningZeroOut:
