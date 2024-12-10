@@ -137,28 +137,26 @@ class Sage_TripleJoinText:
     def join_str(self, separator, str1, str2, str3):
         return (separator.join([str1, str2, str3]),)
 
-# Commented out in __init__.py, because it doesn't currently work.
 class Sage_ViewText:
     @classmethod
-    def INPUT_TYPES(cls):
+    def INPUT_TYPES(s):
         return {
             "required": {
-                "str": ("STRING", {"defaultInput": True}),
+                "text": ("STRING", {"forceInput": True, "multiline": True})
             }
         }
     
-    RETURN_TYPES = ()
-    RETURN_NAMES = ()
+    RETURN_TYPES = ("STRING",)
     
-    FUNCTION = "show_str"
+    FUNCTION = "show_text"
     
     CATEGORY = "Sage Utils/primitives"
     DESCRIPTION = "Shows some text."
     OUTPUT_NODE = True
-    INPUT_IS_LIST = (True,)
     
-    def show_str(self, str):
-       return ({"ui": {"text": [f"{str}"]}})
+    def show_text(self, text):
+        print(f"String is '{text}'")
+        return { "ui": {"text": text}, "result" : (text,) }
 
 class Sage_PonyPrefix:
     @classmethod
@@ -184,7 +182,7 @@ class Sage_PonyPrefix:
         if add_score == True:
             prefix += "score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, "
         if prompt is None:
-            prefix += f"source_{source}, rating_{rating}"
+            prefix += f"source_{source}, rating_{rating}, "
         else:
             prefix += f"source_{source}, rating_{rating}, {prompt}"
         return (prefix,)

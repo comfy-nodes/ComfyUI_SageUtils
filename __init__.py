@@ -6,6 +6,7 @@ from .sage_basic import *
 from .sage_loaders import *
 
 sage_cache.load_cache()
+WEB_DIRECTORY = "./js"
 
 # A dictionary that contains all nodes you want to export with their names
 # NOTE: names should be globally unique
@@ -16,7 +17,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_SetText": Sage_SetText,
     "Sage_JoinText": Sage_JoinText,
     "Sage_TripleJoinText": Sage_TripleJoinText,
-    #"Sage_ViewText": Sage_ViewText,
+    "Sage_ViewText": Sage_ViewText,
     "Sage_ConditioningZeroOut": Sage_ConditioningZeroOut,
     "Sage_GetFileHash": Sage_GetFileHash,
     "Sage_GetInfoFromHash": Sage_GetInfoFromHash,
@@ -47,7 +48,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_SetText": "Set Text",
     "Sage_JoinText": "Join Text",
     "Sage_TripleJoinText": "Join Text x3",
-    #"Sage_ViewText": "View Text",
+    "Sage_ViewText": "View Text",
     "Sage_ConditioningZeroOut": "Zero Conditioning",
     "Sage_GetFileHash": "Get Sha256 Hash",
     "Sage_GetInfoFromHash": "Get Model Info From Hash",
@@ -70,4 +71,4 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_IterOverFiles": "Scan for Metadata and Calculate Hashes"
 }
 
-__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS'] 
+__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY'] 
