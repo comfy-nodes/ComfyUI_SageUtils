@@ -420,15 +420,7 @@ class Sage_LoraStack:
     DESCRIPTION = "Choose a lora with weights, and add it to a lora_stack. Compatable with other node packs that have lora_stacks."
     
     def add_lora_to_stack(self, lora_name, model_weight, clip_weight, lora_stack = None):
-        lora = (lora_name, model_weight, clip_weight)
-        if lora_stack is None:
-            stack = [lora]
-            return(stack,)
-        
-        stack = []
-        for the_name, m_weight, c_weight in lora_stack:
-            stack.append((the_name, m_weight, c_weight))
-        stack.append((lora_name, model_weight, clip_weight))
+        stack = add_lora_to_stack(lora_name, model_weight, clip_weight, lora_stack)
 
         return (stack,)
 

@@ -96,7 +96,19 @@ def lora_to_prompt(lora_stack = None):
         for lora in lora_stack:
             lora_info += lora_to_string(lora[0], lora[1], lora[2])
     return lora_info
-    
+
+def add_lora_to_stack(lora_name, model_weight, clip_weight, lora_stack = None):
+    if lora_stack is None:
+        lora = (lora_name, model_weight, clip_weight)
+        stack = [lora]
+        return(stack)
+        
+    stack = []
+    for the_name, m_weight, c_weight in lora_stack:
+        stack.append((the_name, m_weight, c_weight))
+    stack.append((lora_name, model_weight, clip_weight))
+    return stack
+
 def get_lora_hash(lora_name):
     lora_path = folder_paths.get_full_path_or_raise("loras", lora_name)
     pull_metadata(lora_path)
