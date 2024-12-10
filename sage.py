@@ -241,11 +241,11 @@ class Sage_SamplerInfo:
         }
 
     RETURN_TYPES = ("SAMPLER_INFO",)
-    OUTPUT_TOOLTIPS = ("To be piped to the Construct Metadata node.",)
+    OUTPUT_TOOLTIPS = ("To be piped to the Construct Metadata node and the KSampler with Metadata node.",)
     FUNCTION = "pass_info"
 
     CATEGORY = "Sage Utils/metadata"
-    DESCRIPTION = "Grabs most of the sampler info and passes it to the custom KSampler in this node pack."
+    DESCRIPTION = "Grabs most of the sampler info. Should be routed both to the Construct Metadata node and the KSampler w/ Sampler Info node."
 
     def pass_info(self, seed, steps, cfg, sampler_name, scheduler):
         s_info = {}
@@ -256,17 +256,50 @@ class Sage_SamplerInfo:
         s_info["scheduler"] = scheduler
         return s_info,
 
+class Sage_AdvSamplerInfo:
+    def __init__(self):
+        pass
+    
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "add_noise": ("BOOLEAN", {"default": True}),
+                "start_at_step": ("INT", {"default": 0, "min": 0, "max": 10000}),
+                "end_at_step": ("INT", {"default": 10000, "min": 0, "max": 10000}),
+                "return_with_leftover_noise": ("BOOLEAN", {"default": False})
+            }
+        }
+
+    RETURN_TYPES = ("ADV_SAMPLER_INFO",)
+    OUTPUT_TOOLTIPS = ("To be piped to the KSampler.",)
+    FUNCTION = "pass_adv_info"
+
+    CATEGORY = "Sage Utils/metadata"
+    DESCRIPTION = "Adds more optional values to the KSampler."
+
+    def pass_adv_info(self, add_noise, start_at_step, end_at_step, return_with_leftover_noise):
+        s_info = {}
+        s_info["add_noise"] = add_noise
+        s_info["start_at_step"] = start_at_step
+        s_info["end_at_step"] = end_at_step
+        s_info["return_with_leftover_noise"] = return_with_leftover_noise
+        return s_info,
+
 class Sage_KSampler:
     @classmethod
     def INPUT_TYPES(s):
         return {
             "required": {
                 "model": ("MODEL", {"tooltip": "The model used for denoising the input latent."}),
-                "sampler_info": ('SAMPLER_INFO', { "defaultInput": True}),
+                "sampler_info": ('SAMPLER_INFO', { "defaultInput": True, "tooltip": "Adds in most of the KSampler options. Should be piped both here and to the Construct Metadata node."}),
                 "positive": ("CONDITIONING", {"tooltip": "The conditioning describing the attributes you want to include in the image."}),
                 "negative": ("CONDITIONING", {"tooltip": "The conditioning describing the attributes you want to exclude from the image."}),
                 "latent_image": ("LATENT", {"tooltip": "The latent image to denoise."}),
-                "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "The amount of denoising applied, lower values will maintain the structure of the initial image allowing for image to image sampling."}),
+                "denoise": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01, "tooltip": "The amount of denoising applied, lower values will maintain the structure of the initial image allowing for image to image sampling."})
+            },
+            "optional": {
+                "advanced_info": ('ADV_SAMPLER_INFO', {"defaultInput": True, "tooltip": "Optional. Adds in the options an advanced KSampler would have."})
             }
         }
 
@@ -277,8 +310,18 @@ class Sage_KSampler:
     CATEGORY = "Sage Utils"
     DESCRIPTION = "Uses the provided model, positive and negative conditioning to denoise the latent image. Designed to work with the Sampler info node."
 
-    def sample(self, model, sampler_info, positive, negative, latent_image, denoise=1.0):
-        return nodes.common_ksampler(model, sampler_info["seed"], sampler_info["steps"], sampler_info["cfg"], sampler_info["sampler"], sampler_info["scheduler"], positive, negative, latent_image, denoise=denoise)
+    def sample(self, model, sampler_info, positive, negative, latent_image, denoise=1.0, advanced_info = None):
+        if advanced_info is None:
+            return nodes.common_ksampler(model, sampler_info["seed"], sampler_info["steps"], sampler_info["cfg"], sampler_info["sampler"], sampler_info["scheduler"], positive, negative, latent_image, denoise=denoise)
+        
+        force_full_denoise = True
+        if advanced_info["return_with_leftover_noise"] == True:
+            force_full_denoise = False
+
+        disable_noise = False
+        if advanced_info["add_noise"] == False:
+            disable_noise = True
+        return nodes.common_ksampler(model, sampler_info["seed"], sampler_info["steps"], sampler_info["cfg"], sampler_info["sampler"],  sampler_info["scheduler"], positive, negative, latent_image, denoise=denoise, disable_noise=disable_noise, start_step=advanced_info['start_at_step'], last_step=advanced_info['end_at_step'], force_full_denoise=force_full_denoise)
 
 class Sage_ConstructMetadata:
     def __init__(self):
