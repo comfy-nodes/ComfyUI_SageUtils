@@ -1,11 +1,13 @@
 import ComfyUI_SageUtils.sage_cache
 import ComfyUI_SageUtils.sage_utils
+import ComfyUI_SageUtils.sage_styles
 
 from .sage import *
 from .sage_basic import *
 from .sage_loaders import *
 
 sage_cache.load_cache()
+sage_styles.load_styles()
 WEB_DIRECTORY = "./js"
 
 # A dictionary that contains all nodes you want to export with their names
