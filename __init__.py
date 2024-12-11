@@ -65,7 +65,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_LoadImage": "Load Image with Size and Metadata",
     "Sage_UNETLoader": "Load Diffusion Model With Metadata",
     "Sage_CheckpointLoaderSimple": "Load Checkpoint With Metadata",
-    "Sage_LoraStack":   "Simple Lora Stack",
+    "Sage_LoraStack": "Simple Lora Stack",
     "Sage_LoraStackLoader": "Lora Stack Loader",
     "Sage_DualCLIPTextEncode": "Prompts to CLIP",
     "Sage_SamplerInfo": "Sampler Info",
