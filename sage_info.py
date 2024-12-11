@@ -119,7 +119,7 @@ class Sage_GetPicturesFromHash:
         return (ret,)
     
 
-class Sage_IterOverFiles:
+class Sage_PopulateCache:
     @classmethod
     def INPUT_TYPES(s):
         return {

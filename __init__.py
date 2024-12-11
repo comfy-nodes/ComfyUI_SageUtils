@@ -42,7 +42,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_ConstructMetadataLite": Sage_ConstructMetadataLite,
     "Sage_SaveImageWithMetadata": Sage_SaveImageWithMetadata,
     "Sage_PonyPrefix": Sage_PonyPrefix,
-    "Sage_IterOverFiles": Sage_IterOverFiles
+    "Sage_PopulateCache": Sage_PopulateCache
 }
  
 # A dictionary that contains the friendly/humanly readable titles for the nodes
@@ -75,7 +75,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_ConstructMetadataLite": "Construct Metadata Lite",
     "Sage_SaveImageWithMetadata": "Save Image with Added Metadata",
     "Sage_PonyPrefix": "Add Pony v6 Prefixes",
-    "Sage_IterOverFiles": "Scan for Metadata and Calculate Hashes"
+    "Sage_PopulateCache": "Scan for Metadata & Hash"
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY'] 
