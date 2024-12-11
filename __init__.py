@@ -5,6 +5,7 @@ import ComfyUI_SageUtils.sage_styles
 from .sage import *
 from .sage_basic import *
 from .sage_loaders import *
+from .sage_info import *
 
 sage_cache.load_cache()
 sage_styles.load_styles()
@@ -23,6 +24,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_ConditioningZeroOut": Sage_ConditioningZeroOut,
     "Sage_GetFileHash": Sage_GetFileHash,
     "Sage_GetInfoFromHash": Sage_GetInfoFromHash,
+    "Sage_ModelInfoBreakout": Sage_ModelInfoBreakout,
     "Sage_GetPicturesFromHash": Sage_GetPicturesFromHash,
     "Sage_GetModelJSONFromHash": Sage_GetModelJSONFromHash,
     "Sage_CollectKeywordsFromLoraStack": Sage_CollectKeywordsFromLoraStack,
@@ -55,6 +57,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_ConditioningZeroOut": "Zero Conditioning",
     "Sage_GetFileHash": "Get Sha256 Hash",
     "Sage_GetInfoFromHash": "Get Model Info From Hash",
+    "Sage_ModelInfoBreakout": "model_info -> Path and Hash",
     "Sage_GetPicturesFromHash": "Get Model Images From Hash",
     "Sage_GetModelJSONFromHash": "Get Model JSON From Hash",
     "Sage_CollectKeywordsFromLoraStack": "Lora Stack -> Keywords",

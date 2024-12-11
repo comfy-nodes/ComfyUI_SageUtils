@@ -5,12 +5,20 @@ import hashlib
 import requests
 import time
 import datetime
+import numpy as np
+import torch
 import json
+from PIL import Image, ImageOps
+from PIL.PngImagePlugin import PngInfo
+import requests
 
 import folder_paths
 import comfy.utils
 
 import ComfyUI_SageUtils.sage_cache as cache
+
+def name_from_path(path):
+    return pathlib.Path(path).name
 
 def get_civitai_json(hash):
     try:
@@ -160,6 +168,12 @@ def pull_lora_image_urls(hash, nsfw):
         else:
             img_list.append(pic['url'])
     return img_list
+
+def url_to_torch_image(url):
+    img = Image.open(requests.get(url, stream=True).raw)
+    img = ImageOps.exif_transpose(img)
+    img = np.array(img.convert("RGB")).astype(np.float32) / 255.0
+    return (torch.from_numpy(img)[None,])
 
 def civitai_sampler_name(sampler_name, scheduler_name):
     comfy_to_auto = {

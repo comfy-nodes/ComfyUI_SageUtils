@@ -7,7 +7,6 @@ import torch
 
 from PIL import Image, ImageOps
 from PIL.PngImagePlugin import PngInfo
-import requests
 
 # Pieces of ComfyUI that are being brought in for one reason or another.
 import comfy
@@ -17,199 +16,6 @@ import nodes
 
 from .sage_utils import *
 import ComfyUI_SageUtils.sage_cache as cache
-
-class Sage_CollectKeywordsFromLoraStack:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "lora_stack": ("LORA_STACK", {"defaultInput": True})
-            }
-        }
-    
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("keywords",)
-
-    FUNCTION = "get_keywords"
-
-    CATEGORY = "Sage Utils/lora"
-    DESCRIPTION = "Go through each model in the lora stack, grab any keywords from civitai, and combine them into one string. Place at the end of a lora_stack, or you won't get keywords for the entire stack."
-
-    def get_keywords(self, lora_stack):
-        lora_keywords = []
-        if lora_stack is None:
-            return ("",)
-        
-        for lora in lora_stack:
-            try:
-                hash = get_lora_hash(lora[0])
-
-                json = get_civitai_json(hash)
-                keywords = json["trainedWords"]
-                if keywords != []:
-                    lora_keywords.extend(keywords)
-            except:
-                print("Exception getting keywords!")
-                continue
-
-        ret = ", ".join(lora_keywords)
-        ret = ' '.join(ret.split('\n'))
-        return (ret,)
-
-class Sage_GetInfoFromHash:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "hash": ("STRING", {"defaultInput": True})
-            }
-        }
-    
-    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING")
-    RETURN_NAMES = ("type", "base_model", "version_id", "model_id", "name", "version", "trained_words", "url")
-
-    FUNCTION = "get_info"
-    
-    CATEGORY = "Sage Utils/util"
-    DESCRIPTION = "Pull out various useful pieces of information from a hash, such as the model and version id, the model name and version, what model it's based on, and what keywords it has."
-
-    def get_info(self, hash):
-        ret = []
-        path = ""
-
-        try:
-            json = get_civitai_json(hash)
-            ret.append(json["model"]["type"])
-            ret.append(json["baseModel"])
-            ret.append(str(json["id"]))
-            ret.append(str(json["modelId"]))
-            ret.append(json["model"]["name"])
-            ret.append(json["name"])
-            words = json["trainedWords"]
-
-            if words == []:
-                ret.append("")
-            else:
-                ret.append(", ".join(words))
-            ret.append(json["downloadUrl"])
-        except:
-            print("Exception when getting json data.")
-            ret = ["", "", "", "", "", "", "", ""]
-        
-        return (ret[0], ret[1], ret[2], ret[3], ret[4], ret[5], ret[6], ret[7],)
-
-class Sage_GetPicturesFromHash:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "hash": ("STRING", {"defaultInput": True}),
-                "explicit": ("BOOLEAN", {"defaultInput": False})
-            }
-        }
-    
-    RETURN_TYPES = ("IMAGE", )
-    RETURN_NAMES = ("image", )
-
-    FUNCTION = "get_pics"
-    
-    CATEGORY = "Sage Utils/util"
-    DESCRIPTION = "Pull pics from civitai."
-
-    def get_pics(self, hash, explicit):
-        ret_urls = []
-        #ret = []
-        path = ""
-
-        try:
-            ret_urls = pull_lora_image_urls(hash, explicit)
-        except:
-            print("Exception when getting json data.")
-            return([],)
-        
-        #for url in ret_urls:
-        img = Image.open(requests.get(ret_urls[0], stream=True).raw)
-        img = ImageOps.exif_transpose(img)
-        img = np.array(img.convert("RGB")).astype(np.float32) / 255.0
-        ret = torch.from_numpy(img)[None,]
-
-        return (ret,)
-
-class Sage_IterOverFiles:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "base_dir": (list(folder_paths.folder_names_and_paths.keys()), {"defaultInput": False}),
-            }
-        }
-        
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("list",)
-    
-    FUNCTION = "get_files"
-    
-    CATEGORY = "Sage Utils/util"
-    DESCRIPTION = "Calculates the hash of every model in the chosen directory and pulls civitai information. Takes forever. Returns the filenames."
-    
-    def get_files(self, base_dir):
-        ret = pull_all_loras(folder_paths.folder_names_and_paths[base_dir])
-        return (f"{ret}",)
-
-
-class Sage_GetFileHash:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "base_dir": (list(folder_paths.folder_names_and_paths.keys()), {"defaultInput": False}),
-                "filename": ("STRING", {"defaultInput": False}),
-            }
-        }
-        
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("hash",)
-    
-    FUNCTION = "get_hash"
-    
-    CATEGORY = "Sage Utils/util"
-    DESCRIPTION = "Get an sha256 hash of a file. Can be used for detecting models, civitai calls and such."
-    
-    def get_hash(self, base_dir, filename):
-        the_hash = ""
-        try:
-            file_path = folder_paths.get_full_path_or_raise(base_dir, filename)
-            pull_metadata(file_path)
-            the_hash = cache.cache_data[file_path]["hash"]
-        except:
-            print(f"Unable to hash file '{file_path}'. \n")
-            the_hash = ""
-        
-        print(f"Hash for '{file_path}': {the_hash}")
-        return (str(the_hash),)
-
-class Sage_GetModelJSONFromHash:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "hash": ("STRING", {"defaultInput": True})
-            }
-        }
-        
-    RETURN_TYPES = ("STRING",)
-    
-    FUNCTION = "pull_json"
-    CATEGORY = "Sage Utils/util"
-    DESCRIPTION = "Returns the JSON that civitai will give you, based on a hash. Useful if you want to see all the information, just what I'm using. This is the specific version hash."
-
-    def pull_json(self, hash):
-        the_json = {}
-        try:
-            the_json = get_civitai_json(hash)
-        except:
-            the_json = {}
-        return(f"{json.dumps(the_json)}",)
 
 class Sage_DualCLIPTextEncode:
     @classmethod
@@ -421,7 +227,7 @@ class Sage_ConstructMetadata:
         if negative_string != "":
             metadata += f"Negative prompt: {negative_string}" + "\n"
         metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height},"
-        metadata += f"Model: {model_info['name']}, Model hash: {model_info['hash']}, Version: v1.10-RC-6-comfyui, {civitai_string}, {lora_hash_string}"
+        metadata += f"Model: {name_from_path(model_info['path'])}, Model hash: {model_info['hash']}, Version: v1.10-RC-6-comfyui, {civitai_string}, {lora_hash_string}"
         return metadata,
 
 

@@ -38,9 +38,7 @@ class Sage_CheckpointLoaderSimple:
     DESCRIPTION = "Loads a diffusion model checkpoint. Also returns a model_info output to pass to the construct metadata node, and the hash. (And hashes and pulls civitai info for the file.)"
 
     def load_checkpoint(self, ckpt_name):
-        model_info = { "full_name": ckpt_name }
-        model_info["path"] = folder_paths.get_full_path_or_raise("checkpoints", ckpt_name)
-        model_info["name"] = pathlib.Path(model_info["full_name"]).name
+        model_info = { "path": folder_paths.get_full_path_or_raise("checkpoints", ckpt_name) }
         pull_metadata(model_info["path"], True)
 
         model_info["hash"] = cache.cache_data[model_info["path"]]["hash"]
@@ -71,14 +69,13 @@ class Sage_UNETLoader:
         elif weight_dtype == "fp8_e5m2":
             model_options["dtype"] = torch.float8_e5m2
 
-        model_info = { "full_name": unet_name }
+        model_info = { "name": pathlib.Path(unet_name).name }
         model_info["path"] = folder_paths.get_full_path_or_raise("diffusion_models", unet_name)
-        model_info["name"] = pathlib.Path(model_info["full_name"]).name
         pull_metadata(model_info["path"], True)
         model_info["hash"] = cache.cache_data[model_info["path"]]["hash"]
 
         model = comfy.sd.load_diffusion_model(model_info["path"], model_options=model_options)
-        return (model,model_info, model_info["hash"])
+        return (model, model_info, model_info["hash"])
  
 # Modified version of the main lora loader.
 class Sage_LoraStackLoader:
