@@ -224,25 +224,50 @@ class Sage_CacheMaintenance:
             }
         }
         
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("ghost_entries",)
+    RETURN_TYPES = ("STRING", "STRING", "STRING")
+    RETURN_NAMES = ("ghost_entries", "dup_hash","dup_model")
     
     FUNCTION = "cache_maintenance"
     CATEGORY = "Sage Utils/util"
-    DESCRIPTION = "Lets you remove entries for models that are no longer there. May scan for duplicates eventually."
+    DESCRIPTION = "Lets you remove entries for models that are no longer there. dup_hash returns a list of files with the same hash, and dup_model returns ones with the same civitai model id (but not neccessarily the same version)."
 
     def cache_maintenance(self, remove_ghost_entries):
         ghost_entries = []
+        cache_by_hash = {}
+        cache_by_id = {}
+        dup_hash = {}
+        dup_id = {}
 
         for model_path in cache.cache_data.keys():
             if pathlib.Path(model_path).is_file() == False:
                 ghost_entries.append(model_path)
+            else:
+                if 'hash' in cache.cache_data[model_path]:
+                    cur_hash = cache.cache_data[model_path]['hash']
+                    if cur_hash not in cache_by_hash:
+                        cache_by_hash[cur_hash] = []
+                    cache_by_hash[cur_hash].append(model_path)
+                if 'modelId' in cache.cache_data[model_path]:
+                    cur_id = cache.cache_data[model_path]['modelId']
+                    if cur_id not in cache_by_id:
+                        cache_by_id[cur_id] = []
+                    cache_by_id[cur_id].append(model_path)
 
         if remove_ghost_entries == True:
             for ghost in ghost_entries:
                 cache.cache_data.pop(ghost)
             cache.save_cache()
 
-        return(", ".join(ghost_entries),)
+        for cur_hash in cache_by_hash:
+            if len(cache_by_hash[cur_hash]) > 1:
+                dup_hash[cur_hash] = cache_by_hash[cur_hash]
+        
+        for cur_id in cache_by_id:
+            if len(cache_by_id[cur_id]) > 1:
+                dup_id[cur_id] = cache_by_id[cur_id]
+
+        dup_hashes = json.dumps(dup_hash, separators=(",", ":"), sort_keys=True, indent=4)
+        dup_ids = json.dumps(dup_id, separators=(",", ":"), sort_keys=True, indent=4)
+        return(", ".join(ghost_entries), dup_hashes, dup_ids)
 
 
