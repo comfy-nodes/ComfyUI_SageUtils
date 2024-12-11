@@ -5,8 +5,9 @@ import pathlib
 import numpy as np
 import torch
 
-from PIL import Image
+from PIL import Image, ImageOps
 from PIL.PngImagePlugin import PngInfo
+import requests
 
 # Pieces of ComfyUI that are being brought in for one reason or another.
 import comfy
@@ -96,6 +97,43 @@ class Sage_GetInfoFromHash:
             ret = ["", "", "", "", "", "", "", ""]
         
         return (ret[0], ret[1], ret[2], ret[3], ret[4], ret[5], ret[6], ret[7],)
+
+class Sage_GetPicturesFromHash:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "hash": ("STRING", {"defaultInput": True}),
+                "explicit": ("BOOLEAN", {"defaultInput": False})
+            }
+        }
+    
+    RETURN_TYPES = ("IMAGE", )
+    RETURN_NAMES = ("image", )
+
+    FUNCTION = "get_pics"
+    
+    CATEGORY = "Sage Utils/util"
+    DESCRIPTION = "Pull pics from civitai."
+
+    def get_pics(self, hash, explicit):
+        ret_urls = []
+        #ret = []
+        path = ""
+
+        try:
+            ret_urls = pull_lora_image_urls(hash, explicit)
+        except:
+            print("Exception when getting json data.")
+            return([],)
+        
+        #for url in ret_urls:
+        img = Image.open(requests.get(ret_urls[0], stream=True).raw)
+        img = ImageOps.exif_transpose(img)
+        img = np.array(img.convert("RGB")).astype(np.float32) / 255.0
+        ret = torch.from_numpy(img)[None,]
+
+        return (ret,)
 
 class Sage_IterOverFiles:
     @classmethod

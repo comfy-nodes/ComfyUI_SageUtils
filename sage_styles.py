@@ -21,7 +21,7 @@ def load_styles():
             with style_user_path.open(mode = "r") as read_file:
                 temp_styles = json.load(read_file)
                 sage_styles.append(temp_styles)
-        print(f"{json.dumps(sage_styles, separators=(",", ":"), sort_keys=True, indent=4)}")
+        #print(f"{json.dumps(sage_styles, separators=(",", ":"), sort_keys=True, indent=4)}")
     except:
         print("Unable to load styles.")
 

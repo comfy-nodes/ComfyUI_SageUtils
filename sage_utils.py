@@ -150,6 +150,17 @@ def pull_all_loras(the_path):
     
     return ret
 
+def pull_lora_image_urls(hash, nsfw):
+    json = get_civitai_json(hash)
+    img_list = []
+    for pic in json['images']:
+        if pic['nsfwLevel'] > 1:
+            if nsfw == True:
+                img_list.append(pic['url'])
+        else:
+            img_list.append(pic['url'])
+    return img_list
+
 def civitai_sampler_name(sampler_name, scheduler_name):
     comfy_to_auto = {
         'ddim': 'DDIM',

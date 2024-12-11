@@ -1,9 +1,8 @@
 [project]
-name = "sage_utils"
+name = "comfyui_sageutils"
 description = "A collection of custom nodes by arcum42. Currently focused on saving metadata in images so that Civitai picks it up, pulling Civitai information, and misc helper nodes."
 version = "0.4"
-license = { file = "LICENSE" }
-dependencies = []
+license = {file = "LICENSE"}
 
 [project.urls]
 Repository = "https://github.com/arcum42/ComfyUI_SageUtils"
