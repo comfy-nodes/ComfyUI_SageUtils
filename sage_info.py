@@ -214,4 +214,35 @@ class Sage_ModelInfoBreakout:
 
     def model_breakout(self, model_info):
         return(model_info['path'], model_info['hash'])
+    
+class Sage_CacheMaintenance:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "remove_ghost_entries": ("BOOLEAN", {"defaultInput": True})
+            }
+        }
+        
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("ghost_entries",)
+    
+    FUNCTION = "cache_maintenance"
+    CATEGORY = "Sage Utils/util"
+    DESCRIPTION = "Lets you remove entries for models that are no longer there. May scan for duplicates eventually."
+
+    def cache_maintenance(self, remove_ghost_entries):
+        ghost_entries = []
+
+        for model_path in cache.cache_data.keys():
+            if pathlib.Path(model_path).is_file() == False:
+                ghost_entries.append(model_path)
+
+        if remove_ghost_entries == True:
+            for ghost in ghost_entries:
+                cache.cache_data.pop(ghost)
+            cache.save_cache()
+
+        return(", ".join(ghost_entries),)
+
 

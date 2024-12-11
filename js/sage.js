@@ -35,7 +35,7 @@ app.registerExtension({
                     w.inputEl.style.opacity = 0.6;
                     w.inputEl.style.fontSize = "9pt";
                 }
-                w.value = message["text"].join("")
+                w.value = message["text"].join("");
                 this.onResize?.(this.size);
             }
         }
