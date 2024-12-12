@@ -271,3 +271,36 @@ class Sage_CacheMaintenance:
         return(", ".join(ghost_entries), dup_hashes, dup_ids)
 
 
+class Sage_ModelReport:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "type": (("LORA", "Checkpoint"), {"defaultInput": True})
+            }
+        }
+        
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("model_list",)
+    
+    FUNCTION = "pull_list"
+    CATEGORY = "Sage Utils/util"
+    DESCRIPTION = "Returns a list of models in the cache of the specified type, by basel model type."
+    
+    def pull_list(self, type):
+        sorted_models = {}
+        
+        for model_path in cache.cache_data.keys():
+            if 'model' in cache.cache_data[model_path]:
+                if 'type' in cache.cache_data[model_path]['model']:
+                    if cache.cache_data[model_path]['model']['type'] == type:
+                        if 'baseModel' in cache.cache_data[model_path]:
+                            baseModel = cache.cache_data[model_path]['baseModel']
+                            if baseModel not in sorted_models:
+                                sorted_models[baseModel] = []
+                            
+                            sorted_models[baseModel].append(model_path)
+                        
+        ret = json.dumps(sorted_models, separators=(",", ":"), sort_keys=True, indent=4)
+        
+        return (ret,)
