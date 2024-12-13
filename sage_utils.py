@@ -20,9 +20,25 @@ import ComfyUI_SageUtils.sage_cache as cache
 def name_from_path(path):
     return pathlib.Path(path).name
 
-def get_civitai_json(hash):
+def get_civitai_model_version_json(hash):
     try:
         r = requests.get("https://civitai.com/api/v1/model-versions/by-hash/" + hash)
+        r.raise_for_status()
+    except HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+        return {"error": "HTTP error occurred: " + http_err}
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+        return {"error": "Other error occurred: " + err}
+    else:
+        print("Retrieved json from civitai.")
+        return r.json()
+
+    return r.json()
+
+def get_civitai_model_json(modelId):
+    try:
+        r = requests.get("https://civitai.com/api/v1/models/" + str(modelId))
         r.raise_for_status()
     except HTTPError as http_err:
         print(f"HTTP error occurred: {http_err}")
@@ -69,7 +85,7 @@ def pull_metadata(file_path, timestamp = False):
             if (datetime.datetime.now() - last_used).days == 0:
                 print("Pulled earlier today. No pull needed.")
             else:
-                json = get_civitai_json(hash)
+                json = get_civitai_model_version_json(hash)
                 if 'error' in json:
                     print("Error: " + str(json["error"]))
                     if 'model' in cache.cache_data[file_path]:
@@ -159,7 +175,7 @@ def pull_all_loras(the_path):
     return ret
 
 def pull_lora_image_urls(hash, nsfw):
-    json = get_civitai_json(hash)
+    json = get_civitai_model_version_json(hash)
     img_list = []
     for pic in json['images']:
         if pic['nsfwLevel'] > 1:

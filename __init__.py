@@ -44,9 +44,10 @@ NODE_CLASS_MAPPINGS = {
     "Sage_PonyPrefix": Sage_PonyPrefix,
     "Sage_PopulateCache": Sage_PopulateCache,
     "Sage_CacheMaintenance": Sage_CacheMaintenance,
-    "Sage_ModelReport": Sage_ModelReport
+    "Sage_ModelReport": Sage_ModelReport,
+    "Sage_ModelInfoFromModelId": Sage_ModelInfoFromModelId
 }
- 
+
 # A dictionary that contains the friendly/humanly readable titles for the nodes
 NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_SetBool": "Set Bool",
@@ -79,7 +80,8 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_PonyPrefix": "Add Pony v6 Prefixes",
     "Sage_PopulateCache": "Scan for Metadata & Hash",
     "Sage_CacheMaintenance": "Cache Maintenance",
-    "Sage_ModelReport": "Model Report"
+    "Sage_ModelReport": "Model Report",
+    "Sage_ModelInfoFromModelId": "Get Model Info from Model Id"
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY'] 

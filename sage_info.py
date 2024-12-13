@@ -32,7 +32,7 @@ class Sage_CollectKeywordsFromLoraStack:
             try:
                 hash = get_lora_hash(lora[0])
 
-                json = get_civitai_json(hash)
+                json = get_civitai_model_version_json(hash)
                 keywords = json["trainedWords"]
                 if keywords != []:
                     lora_keywords.extend(keywords)
@@ -66,7 +66,7 @@ class Sage_GetInfoFromHash:
         path = ""
 
         try:
-            json = get_civitai_json(hash)
+            json = get_civitai_model_version_json(hash)
             ret.append(json["model"]["type"])
             ret.append(json["baseModel"])
             ret.append(str(json["id"]))
@@ -190,7 +190,7 @@ class Sage_GetModelJSONFromHash:
     def pull_json(self, hash):
         the_json = {}
         try:
-            the_json = get_civitai_json(hash)
+            the_json = get_civitai_model_version_json(hash)
         except:
             the_json = {}
         return(f"{json.dumps(the_json)}",)
@@ -285,7 +285,7 @@ class Sage_ModelReport:
     
     FUNCTION = "pull_list"
     CATEGORY = "Sage Utils/util"
-    DESCRIPTION = "Returns a list of models in the cache of the specified type, by basel model type."
+    DESCRIPTION = "Returns a list of models in the cache of the specified type, by base model type."
     
     def pull_list(self, type):
         sorted_models = {}
@@ -302,5 +302,27 @@ class Sage_ModelReport:
                             sorted_models[baseModel].append(model_path)
                         
         ret = json.dumps(sorted_models, separators=(",", ":"), sort_keys=True, indent=4)
+        
+        return (ret,)
+    
+class Sage_ModelInfoFromModelId:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "model_id": ("STRING", {"defaultInput": True})
+            }
+        }
+        
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("model_list",)
+    
+    FUNCTION = "pull_model_json"
+    CATEGORY = "Sage Utils/util"
+    DESCRIPTION = "Returns the model json, given a model id."
+    
+    def pull_model_json(self, model_id):
+        model_json = get_civitai_model_json(model_id)
+        ret = json.dumps(model_json, separators=(",", ":"), sort_keys=True, indent=4)
         
         return (ret,)
