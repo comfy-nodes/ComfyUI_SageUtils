@@ -289,21 +289,7 @@ class Sage_LoraStackRecent:
 
     @classmethod
     def INPUT_TYPES(s):
-        lora_list = list()
-        full_lora_list = folder_paths.get_filename_list("loras")
-        for item in full_lora_list:
-            model_path = folder_paths.get_full_path_or_raise("loras", item)
-            if model_path not in cache.cache_data.keys():
-                continue
-            
-            if 'lastUsed' not in cache.cache_data[model_path]:
-                continue
-            
-            last = cache.cache_data[model_path]['lastUsed']
-            last_used = datetime.datetime.fromisoformat(last)
-            #print(f"{model_path} - last: {last} last_used: {last_used}")
-            if (datetime.datetime.now() - last_used).days <= 7:
-                lora_list.append(item)
+        lora_list = get_recently_used_models("loras")
         return {
             "required": {
                 "enabled": ("BOOLEAN", {"defaultInput": False, "default": True}),

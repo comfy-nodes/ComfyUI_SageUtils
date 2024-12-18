@@ -194,6 +194,24 @@ def url_to_torch_image(url):
     img = np.array(img.convert("RGB")).astype(np.float32) / 255.0
     return (torch.from_numpy(img)[None,])
 
+def get_recently_used_models(model_type):
+        model_list = list()
+        full_model_list = folder_paths.get_filename_list(model_type)
+        for item in full_model_list:
+            model_path = folder_paths.get_full_path_or_raise(model_type, item)
+            if model_path not in cache.cache_data.keys():
+                continue
+            
+            if 'lastUsed' not in cache.cache_data[model_path]:
+                continue
+            
+            last = cache.cache_data[model_path]['lastUsed']
+            last_used = datetime.datetime.fromisoformat(last)
+            #print(f"{model_path} - last: {last} last_used: {last_used}")
+            if (datetime.datetime.now() - last_used).days <= 7:
+                model_list.append(item)
+        return model_list
+
 def civitai_sampler_name(sampler_name, scheduler_name):
     comfy_to_auto = {
         'ddim': 'DDIM',

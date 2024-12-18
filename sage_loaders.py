@@ -21,21 +21,7 @@ class Sage_CheckpointLoaderRecent:
     
     @classmethod
     def INPUT_TYPES(s):
-        ckpt_list = list()
-        full_ckpt_list = folder_paths.get_filename_list("checkpoints")
-        for item in full_ckpt_list:
-            model_path = folder_paths.get_full_path_or_raise("checkpoints", item)
-            if model_path not in cache.cache_data.keys():
-                continue
-            
-            if 'lastUsed' not in cache.cache_data[model_path]:
-                continue
-            
-            last = cache.cache_data[model_path]['lastUsed']
-            last_used = datetime.datetime.fromisoformat(last)
-            #print(f"{model_path} - last: {last} last_used: {last_used}")
-            if (datetime.datetime.now() - last_used).days <= 7:
-                ckpt_list.append(item)
+        ckpt_list = get_recently_used_models("checkpoints")
             
         return {
             "required": {
