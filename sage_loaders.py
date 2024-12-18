@@ -14,6 +14,55 @@ import comfy
 import folder_paths
 import node_helpers
 
+
+class Sage_CheckpointLoaderRecent:
+    def __init__(self):
+        pass
+    
+    @classmethod
+    def INPUT_TYPES(s):
+        ckpt_list = list()
+        full_ckpt_list = folder_paths.get_filename_list("checkpoints")
+        for item in full_ckpt_list:
+            model_path = folder_paths.get_full_path_or_raise("checkpoints", item)
+            if model_path not in cache.cache_data.keys():
+                continue
+            
+            if 'lastUsed' not in cache.cache_data[model_path]:
+                continue
+            
+            last = cache.cache_data[model_path]['lastUsed']
+            last_used = datetime.datetime.fromisoformat(last)
+            #print(f"{model_path} - last: {last} last_used: {last_used}")
+            if (datetime.datetime.now() - last_used).days <= 7:
+                ckpt_list.append(item)
+            
+        return {
+            "required": {
+                "ckpt_name": (ckpt_list, {"tooltip": "The name of the checkpoint (model) to load."}),
+            }
+        }
+    RETURN_TYPES = ("MODEL", "CLIP", "VAE", "MODEL_INFO")
+    RETURN_NAMES = ("model", "clip", "vae", "model_info")
+    OUTPUT_TOOLTIPS = ("The model used for denoising latents.", 
+                    "The CLIP model used for encoding text prompts.", 
+                    "The VAE model used for encoding and decoding images to and from latent space.",
+                    "The model path and hash, all in one output.")
+    FUNCTION = "load_checkpoint"
+
+    CATEGORY  =  "Sage Utils/loaders"
+    DESCRIPTION = "Loads a diffusion model checkpoint. Also returns a model_info output to pass to the construct metadata node, and the hash. (And hashes and pulls civitai info for the file.)"
+
+    def load_checkpoint(self, ckpt_name):
+        model_info = { "path": folder_paths.get_full_path_or_raise("checkpoints", ckpt_name) }
+        pull_metadata(model_info["path"], True)
+
+        model_info["hash"] = cache.cache_data[model_info["path"]]["hash"]
+    
+        out = comfy.sd.load_checkpoint_guess_config(model_info["path"], output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
+        result = (*out[:3], model_info)
+        return (result)
+    
 class Sage_CheckpointLoaderSimple:
     def __init__(self):
         pass

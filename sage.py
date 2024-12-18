@@ -282,6 +282,56 @@ class Sage_ConstructMetadataLite:
         metadata += f"Version: v1.10-RC-6-comfyui, Civitai resources: {json.dumps(resource_hashes)}"
         return metadata,
 
+
+class Sage_LoraStackRecent:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        lora_list = list()
+        full_lora_list = folder_paths.get_filename_list("loras")
+        for item in full_lora_list:
+            model_path = folder_paths.get_full_path_or_raise("loras", item)
+            if model_path not in cache.cache_data.keys():
+                continue
+            
+            if 'lastUsed' not in cache.cache_data[model_path]:
+                continue
+            
+            last = cache.cache_data[model_path]['lastUsed']
+            last_used = datetime.datetime.fromisoformat(last)
+            #print(f"{model_path} - last: {last} last_used: {last_used}")
+            if (datetime.datetime.now() - last_used).days <= 7:
+                lora_list.append(item)
+        return {
+            "required": {
+                "enabled": ("BOOLEAN", {"defaultInput": False, "default": True}),
+                "lora_name": (lora_list, {"defaultInput": False, "tooltip": "The name of the LoRA."}),
+                "model_weight": ("FLOAT", {"defaultInput": False, "default": 1.0, "min": -100.0, "max": 100.0, "step": 0.01, "tooltip": "How strongly to modify the diffusion model. This value can be negative."}),
+                "clip_weight": ("FLOAT", {"defaultInput": False, "default": 1.0, "min": -100.0, "max": 100.0, "step": 0.01, "tooltip": "How strongly to modify the CLIP model. This value can be negative."}),
+                },
+            "optional": {
+                "lora_stack": ("LORA_STACK", {"defaultInput": True}),
+            }
+        }
+
+    RETURN_TYPES = ("LORA_STACK",)
+    RETURN_NAMES = ("lora_stack",)
+    
+    FUNCTION = "add_lora_to_stack"
+    CATEGORY = "Sage Utils/lora"
+    DESCRIPTION = "Choose a lora with weights, and add it to a lora_stack. Compatable with other node packs that have lora_stacks."
+    
+    def add_lora_to_stack(self, enabled, lora_name, model_weight, clip_weight, lora_stack = None):
+        if enabled == True:
+            stack = add_lora_to_stack(lora_name, model_weight, clip_weight, lora_stack)
+        else:
+            stack = lora_stack
+
+        return (stack,)
+
+
 class Sage_LoraStack:
     def __init__(self):
         pass
