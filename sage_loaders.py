@@ -28,9 +28,9 @@ class Sage_CheckpointLoaderSimple:
     RETURN_TYPES = ("MODEL", "CLIP", "VAE", "MODEL_INFO")
     RETURN_NAMES = ("model", "clip", "vae", "model_info")
     OUTPUT_TOOLTIPS = ("The model used for denoising latents.", 
-                       "The CLIP model used for encoding text prompts.", 
-                       "The VAE model used for encoding and decoding images to and from latent space.",
-                       "The model path and hash, all in one output.")
+                    "The CLIP model used for encoding text prompts.", 
+                    "The VAE model used for encoding and decoding images to and from latent space.",
+                    "The model path and hash, all in one output.")
     FUNCTION = "load_checkpoint"
 
     CATEGORY  =  "Sage Utils/loaders"
@@ -45,13 +45,13 @@ class Sage_CheckpointLoaderSimple:
         out = comfy.sd.load_checkpoint_guess_config(model_info["path"], output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
         result = (*out[:3], model_info)
         return (result)
- 
+
 class Sage_UNETLoader:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { "unet_name": (folder_paths.get_filename_list("diffusion_models"), ),
-                              "weight_dtype": (["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"],)
-                             }}
+                            "weight_dtype": (["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"],)
+                            }}
     RETURN_TYPES = ("MODEL", "MODEL_INFO")
     RETURN_NAMES = ("model", "model_info")
 
@@ -75,7 +75,7 @@ class Sage_UNETLoader:
 
         model = comfy.sd.load_diffusion_model(model_info["path"], model_options=model_options)
         return (model, model_info)
- 
+
 # Modified version of the main lora loader.
 class Sage_LoraStackLoader:
     def __init__(self):
@@ -89,7 +89,7 @@ class Sage_LoraStackLoader:
                 "clip": ("CLIP", {"tooltip": "The CLIP model the LoRA will be applied to."})
             },
             "optional": {
-                 "lora_stack": ("LORA_STACK", {"defaultInput": True})
+                "lora_stack": ("LORA_STACK", {"defaultInput": True})
             }
         }
     

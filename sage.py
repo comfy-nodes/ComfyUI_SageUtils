@@ -285,7 +285,7 @@ class Sage_ConstructMetadataLite:
 class Sage_LoraStack:
     def __init__(self):
         pass
- 
+
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -299,7 +299,7 @@ class Sage_LoraStack:
                 "lora_stack": ("LORA_STACK", {"defaultInput": True}),
             }
         }
- 
+
     RETURN_TYPES = ("LORA_STACK",)
     RETURN_NAMES = ("lora_stack",)
     
