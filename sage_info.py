@@ -58,7 +58,7 @@ class Sage_GetInfoFromHash:
 
     FUNCTION = "get_info"
     
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/debug"
     DESCRIPTION = "Pull out various useful pieces of information from a hash, such as the model and version id, the model name and version, what model it's based on, and what keywords it has."
 
     def get_info(self, hash):
@@ -102,7 +102,7 @@ class Sage_GetPicturesFromHash:
 
     FUNCTION = "get_pics"
     
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/debug"
     DESCRIPTION = "Pull pics from civitai."
 
     def get_pics(self, hash, explicit):
@@ -133,7 +133,7 @@ class Sage_PopulateCache:
     
     FUNCTION = "get_files"
     
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/cache"
     DESCRIPTION = "Calculates the hash of every model in the chosen directory and pulls civitai information. Takes forever. Returns the filenames."
     
     def get_files(self, base_dir):
@@ -156,7 +156,7 @@ class Sage_GetFileHash:
     
     FUNCTION = "get_hash"
     
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/debug"
     DESCRIPTION = "Get an sha256 hash of a file. Can be used for detecting models, civitai calls and such."
     
     def get_hash(self, base_dir, filename):
@@ -184,7 +184,7 @@ class Sage_GetModelJSONFromHash:
     RETURN_TYPES = ("STRING",)
     
     FUNCTION = "pull_json"
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/debug"
     DESCRIPTION = "Returns the JSON that civitai will give you, based on a hash. Useful if you want to see all the information, just what I'm using. This is the specific version hash."
 
     def pull_json(self, hash):
@@ -209,7 +209,7 @@ class Sage_ModelInfoBreakout:
     RETURN_NAMES = ("path", "hash")
     
     FUNCTION = "model_breakout"
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/debug"
     DESCRIPTION = "Breaks down the model info output into the path and hash."
 
     def model_breakout(self, model_info):
@@ -228,7 +228,7 @@ class Sage_CacheMaintenance:
     RETURN_NAMES = ("ghost_entries", "dup_hash","dup_model")
     
     FUNCTION = "cache_maintenance"
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/cache"
     DESCRIPTION = "Lets you remove entries for models that are no longer there. dup_hash returns a list of files with the same hash, and dup_model returns ones with the same civitai model id (but not neccessarily the same version)."
 
     def cache_maintenance(self, remove_ghost_entries):
@@ -284,7 +284,7 @@ class Sage_ModelReport:
     RETURN_NAMES = ("model_list",)
     
     FUNCTION = "pull_list"
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/cache"
     DESCRIPTION = "Returns a list of models in the cache of the specified type, by base model type."
     
     def pull_list(self, type):
