@@ -65,55 +65,51 @@ def get_file_sha256(path):
 
 def pull_metadata(file_path, timestamp = False):
     cache.load_cache()
-    print(f"Pull metadata for {file_path}.")
-    hash = ""
-
-    if file_path in cache.cache_data:
-        if 'hash' in cache.cache_data[file_path]:
-            hash = cache.cache_data[file_path]["hash"]
-            time.sleep(3)
     
-    if hash == "":
-        cache.cache_data[file_path] = {}
-        cache.cache_data[file_path]["hash"] = get_file_sha256(file_path)
+    print(f"Pull metadata for {file_path}.")
+    hash = cache.cache_data.get(file_path, {}).get("hash", "")
+
+    if not hash:
+        cache.cache_data[file_path] = {"hash": get_file_sha256(file_path)}
         hash = cache.cache_data[file_path]["hash"]
+    else:
+        time.sleep(3)
     
     try:
         pull_json = True
-        if 'lastUsed' in cache.cache_data[file_path] and 'civitai' in cache.cache_data[file_path]:
-            last = cache.cache_data[file_path]['lastUsed']
-            last_used = datetime.datetime.fromisoformat(last)
+        file_cache = cache.cache_data.get(file_path, {})
+        
+        if 'lastUsed' in file_cache and 'civitai' in file_cache:
+            last_used = datetime.datetime.fromisoformat(file_cache['lastUsed'])
             if (datetime.datetime.now() - last_used).days == 0:
                 print("Pulled earlier today. No pull needed.")
                 pull_json = False
-                
-        if pull_json == True:
+
+        if pull_json:
             json = get_civitai_model_version_json(hash)
             if 'error' in json:
-                print("Error: " + str(json["error"]))
-                if 'model' in cache.cache_data[file_path]:
-                    if 'civitai' not in cache.cache_data[file_path]:
-                        cache.cache_data[file_path]['civitai'] = "False"
-                else:
-                    cache.cache_data[file_path]['civitai'] = "False"
+                print(f"Error: {json['error']}")
+                file_cache['civitai'] = file_cache.get('model', "False")
             else:
-                cache.cache_data[file_path]['civitai'] = "True"
-                cache.cache_data[file_path]["model"] = json["model"]
-                cache.cache_data[file_path]["name"] = json["name"]
-                cache.cache_data[file_path]["baseModel"] = json["baseModel"]
-                cache.cache_data[file_path]["id"] = json["id"]
-                cache.cache_data[file_path]["modelId"] = json["modelId"]
-                cache.cache_data[file_path]["trainedWords"] = json["trainedWords"]
-                cache.cache_data[file_path]["downloadUrl"] = json["downloadUrl"]
+                file_cache.update({
+                    'civitai': "True",
+                    'model': json["model"],
+                    'name': json["name"],
+                    'baseModel': json["baseModel"],
+                    'id': json["id"],
+                    'modelId': json["modelId"],
+                    'trainedWords': json["trainedWords"],
+                    'downloadUrl': json["downloadUrl"]
+                })
                 print("Successfully pulled metadata.")
+    except Exception as e:
+        print(f"Failed to pull metadata for {file_path} with hash {hash}: {e}")
+        file_cache['civitai'] = file_cache.get('civitai', "False")
 
-    except:
-        print(f"Failed to pull metadata for {file_path} with hash {hash}")
-        if 'civitai' not in cache.cache_data[file_path]:
-            cache.cache_data[file_path]['civitai'] = "False"
+    if timestamp:
+        file_cache['lastUsed'] = datetime.datetime.now().isoformat()
 
-    if timestamp == True:
-        cache.cache_data[file_path]['lastUsed'] = datetime.datetime.now().isoformat()
+    cache.cache_data[file_path] = file_cache
     cache.save_cache()
 
 def lora_to_string(lora_name, model_weight, clip_weight):
