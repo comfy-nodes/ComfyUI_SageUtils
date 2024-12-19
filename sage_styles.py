@@ -9,19 +9,13 @@ style_user_path = pathlib.Path(folder_paths.base_path) / "custom_nodes" / "Comfy
 
 def load_styles():
     global sage_styles
-    global style_path
-    
-    try:
-        sage_styles = []
-        if style_path.is_file():
-            with style_path.open(mode = "r") as read_file:
-                temp_styles = json.load(read_file)
-                sage_styles.append(temp_styles)
-        if style_user_path.is_file():
-            with style_user_path.open(mode = "r") as read_file:
-                temp_styles = json.load(read_file)
-                sage_styles.append(temp_styles)
-        #print(f"{json.dumps(sage_styles, separators=(",", ":"), sort_keys=True, indent=4)}")
-    except:
-        print("Unable to load styles.")
+    sage_styles = []
+
+    for path in [style_path, style_user_path]:
+        if path.is_file():
+            try:
+                with path.open(mode="r") as read_file:
+                    sage_styles.append(json.load(read_file))
+            except Exception as e:
+                print(f"Unable to load styles from {path}: {e}")
 

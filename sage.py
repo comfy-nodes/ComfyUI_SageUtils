@@ -38,35 +38,29 @@ class Sage_DualCLIPTextEncode:
     CATEGORY = "Sage Utils/clip"
     DESCRIPTION = "Turns a positive and negative prompt into conditionings, and passes through the prompts. Saves space over two CLIP Text Encoders, and zeros any input not hooked up."
 
-    def get_conditioning(self, clip, text = None):
-        zero_text = False
-        if text == None:
-            zero_text = True
-            text = ""
+    def get_conditioning(self, clip, text=None):
+        zero_text = text is None
+        text = text or ""
 
         tokens = clip.tokenize(text)
         output = clip.encode_from_tokens(tokens, return_pooled=True, return_dict=True)
         cond = output.pop("cond")
 
-        if zero_text == True:
-            pooled_output = output.get("pooled_output", None)
+        if zero_text:
+            pooled_output = output.get("pooled_output")
             if pooled_output is not None:
                 output["pooled_output"] = torch.zeros_like(pooled_output)
-            return ([[torch.zeros_like(cond), output]])
+            return [[torch.zeros_like(cond), output]]
             
-        return ([[cond, output]])
+        return [[cond, output]]
 
-    def encode(self, clip, pos = None, neg = None):
-        ret_pos = ""
-        ret_neg = ""
-
-        if pos != None:
-            ret_pos = pos
-        
-        if neg != None:
-            ret_neg = neg
-
-        return (self.get_conditioning(clip, pos), self.get_conditioning(clip, neg), ret_pos, ret_neg)
+    def encode(self, clip, pos=None, neg=None):
+        return (
+            self.get_conditioning(clip, pos),
+            self.get_conditioning(clip, neg),
+            pos or "",
+            neg or ""
+        )
 
 class Sage_SamplerInfo:
     def __init__(self):
@@ -92,13 +86,7 @@ class Sage_SamplerInfo:
     DESCRIPTION = "Grabs most of the sampler info. Should be routed both to the Construct Metadata node and the KSampler w/ Sampler Info node."
 
     def pass_info(self, seed, steps, cfg, sampler_name, scheduler):
-        s_info = {}
-        s_info["seed"] = seed
-        s_info["steps"] = steps
-        s_info["cfg"] = cfg
-        s_info["sampler"] = sampler_name
-        s_info["scheduler"] = scheduler
-        return s_info,
+        return {"seed": seed, "steps": steps, "cfg": cfg, "sampler": sampler_name, "scheduler": scheduler},
 
 class Sage_AdvSamplerInfo:
     def __init__(self):

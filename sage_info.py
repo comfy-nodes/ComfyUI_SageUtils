@@ -184,16 +184,14 @@ class Sage_GetModelJSONFromHash:
     RETURN_TYPES = ("STRING",)
     
     FUNCTION = "pull_json"
-    CATEGORY = "Sage Utils/debug"
+    CATEGORY = "Sage Utils/util"
     DESCRIPTION = "Returns the JSON that civitai will give you, based on a hash. Useful if you want to see all the information, just what I'm using. This is the specific version hash."
-
     def pull_json(self, hash):
-        the_json = {}
         try:
             the_json = get_civitai_model_version_json(hash)
         except:
             the_json = {}
-        return(f"{json.dumps(the_json)}",)
+        return (json.dumps(the_json),)
 
 
 class Sage_ModelInfoBreakout:
@@ -209,7 +207,7 @@ class Sage_ModelInfoBreakout:
     RETURN_NAMES = ("path", "hash")
     
     FUNCTION = "model_breakout"
-    CATEGORY = "Sage Utils/debug"
+    CATEGORY = "Sage Utils/util"
     DESCRIPTION = "Breaks down the model info output into the path and hash."
 
     def model_breakout(self, model_info):
@@ -232,43 +230,27 @@ class Sage_CacheMaintenance:
     DESCRIPTION = "Lets you remove entries for models that are no longer there. dup_hash returns a list of files with the same hash, and dup_model returns ones with the same civitai model id (but not neccessarily the same version)."
 
     def cache_maintenance(self, remove_ghost_entries):
-        ghost_entries = []
+        ghost_entries = [path for path in cache.cache_data if not pathlib.Path(path).is_file()]
         cache_by_hash = {}
         cache_by_id = {}
         dup_hash = {}
         dup_id = {}
 
-        for model_path in cache.cache_data.keys():
-            if pathlib.Path(model_path).is_file() == False:
-                ghost_entries.append(model_path)
-            else:
-                if 'hash' in cache.cache_data[model_path]:
-                    cur_hash = cache.cache_data[model_path]['hash']
-                    if cur_hash not in cache_by_hash:
-                        cache_by_hash[cur_hash] = []
-                    cache_by_hash[cur_hash].append(model_path)
-                if 'modelId' in cache.cache_data[model_path]:
-                    cur_id = cache.cache_data[model_path]['modelId']
-                    if cur_id not in cache_by_id:
-                        cache_by_id[cur_id] = []
-                    cache_by_id[cur_id].append(model_path)
+        for model_path, data in cache.cache_data.items():
+            if 'hash' in data:
+                cache_by_hash.setdefault(data['hash'], []).append(model_path)
+            if 'modelId' in data:
+                cache_by_id.setdefault(data['modelId'], []).append(model_path)
 
-        if remove_ghost_entries == True:
+        if remove_ghost_entries:
             for ghost in ghost_entries:
                 cache.cache_data.pop(ghost)
             cache.save_cache()
 
-        for cur_hash in cache_by_hash:
-            if len(cache_by_hash[cur_hash]) > 1:
-                dup_hash[cur_hash] = cache_by_hash[cur_hash]
-        
-        for cur_id in cache_by_id:
-            if len(cache_by_id[cur_id]) > 1:
-                dup_id[cur_id] = cache_by_id[cur_id]
+        dup_hash = {h: paths for h, paths in cache_by_hash.items() if len(paths) > 1}
+        dup_id = {i: paths for i, paths in cache_by_id.items() if len(paths) > 1}
 
-        dup_hashes = json.dumps(dup_hash, separators=(",", ":"), sort_keys=True, indent=4)
-        dup_ids = json.dumps(dup_id, separators=(",", ":"), sort_keys=True, indent=4)
-        return(", ".join(ghost_entries), dup_hashes, dup_ids)
+        return (", ".join(ghost_entries), json.dumps(dup_hash, separators=(",", ":"), sort_keys=True, indent=4), json.dumps(dup_id, separators=(",", ":"), sort_keys=True, indent=4))
 
 
 class Sage_ModelReport:
@@ -322,7 +304,8 @@ class Sage_ModelInfoFromModelId:
     DESCRIPTION = "Returns the model json, given a model id."
     
     def pull_model_json(self, model_id):
-        model_json = get_civitai_model_json(model_id)
-        ret = json.dumps(model_json, separators=(",", ":"), sort_keys=True, indent=4)
-        
-        return (ret,)
+        try:
+            model_json = get_civitai_model_json(model_id)
+            return (json.dumps(model_json, separators=(",", ":"), sort_keys=True, indent=4),)
+        except:
+            return ("{}",)

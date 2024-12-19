@@ -94,22 +94,24 @@ class Sage_UNETLoader:
     CATEGORY  =  "Sage Utils/loaders"
 
     def load_unet(self, unet_name, weight_dtype):
-        model_options = {}
-        if weight_dtype == "fp8_e4m3fn":
-            model_options["dtype"] = torch.float8_e4m3fn
-        elif weight_dtype == "fp8_e4m3fn_fast":
-            model_options["dtype"] = torch.float8_e4m3fn
+        dtype_map = {
+            "fp8_e4m3fn": torch.float8_e4m3fn,
+            "fp8_e4m3fn_fast": torch.float8_e4m3fn,
+            "fp8_e5m2": torch.float8_e5m2
+        }
+        model_options = {"dtype": dtype_map.get(weight_dtype)}
+        if weight_dtype == "fp8_e4m3fn_fast":
             model_options["fp8_optimizations"] = True
-        elif weight_dtype == "fp8_e5m2":
-            model_options["dtype"] = torch.float8_e5m2
 
-        model_info = { "name": pathlib.Path(unet_name).name }
-        model_info["path"] = folder_paths.get_full_path_or_raise("diffusion_models", unet_name)
+        model_info = {
+            "name": pathlib.Path(unet_name).name,
+            "path": folder_paths.get_full_path_or_raise("diffusion_models", unet_name)
+        }
         pull_metadata(model_info["path"], True)
         model_info["hash"] = cache.cache_data[model_info["path"]]["hash"]
 
         model = comfy.sd.load_diffusion_model(model_info["path"], model_options=model_options)
-        return (model, model_info)
+        return model, model_info
 
 # Modified version of the main lora loader.
 class Sage_LoraStackLoader:
@@ -136,47 +138,36 @@ class Sage_LoraStackLoader:
     DESCRIPTION = "Accept a lora_stack with Model and Clip, and apply all the loras in the stack at once."
 
     def load_lora(self, model, clip, lora_name, strength_model, strength_clip):
-        if strength_model == 0 and strength_clip == 0:
-            return (model, clip)
+        if not (strength_model or strength_clip):
+            return model, clip
 
         lora_path = folder_paths.get_full_path_or_raise("loras", lora_name)
         
-        lora = None
-        if self.loaded_lora is not None:
-            if self.loaded_lora[0] == lora_path:
-                lora = self.loaded_lora[1]
-            else:
-                temp = self.loaded_lora
-                self.loaded_lora = None
-                del temp
-
-        if lora is None:
+        if self.loaded_lora and self.loaded_lora[0] == lora_path:
+            lora = self.loaded_lora[1]
+        else:
             pull_metadata(lora_path, True)
             lora = comfy.utils.load_torch_file(lora_path, safe_load=True)
             self.loaded_lora = (lora_path, lora)
 
-        model_lora, clip_lora = comfy.sd.load_lora_for_models(model, clip, lora, strength_model, strength_clip)
-
-        return (model_lora, clip_lora)
+        return comfy.sd.load_lora_for_models(model, clip, lora, strength_model, strength_clip)
     
-    def load_loras(self, model, clip, lora_stack = None):
-        if lora_stack is None:
+    def load_loras(self, model, clip, lora_stack=None):
+        if not lora_stack:
             print("No lora stacks found. Warning: Passing 'None' to lora_stack output.")
-            return (model, clip, None)
+            return model, clip, None
 
         for lora in lora_stack:
-            model, clip = self.load_lora(model, clip, lora[0], lora[1], lora[2]) if lora else None
-        return (model, clip, lora_stack)
+            if lora:
+                model, clip = self.load_lora(model, clip, *lora)
+        return model, clip, lora_stack
     
 class Sage_LoadImage:
     @classmethod
     def INPUT_TYPES(s):
-        input_dir = folder_paths.get_input_directory()
-        p = pathlib.Path(input_dir).glob('**/*')
-        files = [str(x.relative_to(input_dir)) for x in p if x.is_file()]
-        return {"required":
-                    {"image": (sorted(files), {"image_upload": True})},
-                }
+        files = sorted(str(x.relative_to(folder_paths.get_input_directory())) 
+                       for x in pathlib.Path(folder_paths.get_input_directory()).rglob('*') if x.is_file())
+        return {"required": {"image": (files, {"image_upload": True})}}
 
     CATEGORY = "Sage Utils/loaders"
 
@@ -186,47 +177,32 @@ class Sage_LoadImage:
     FUNCTION = "load_image"
     def load_image(self, image):
         image_path = folder_paths.get_annotated_filepath(image)
-        
         img = node_helpers.pillow(Image.open, image_path)
         
-        output_images = []
-        output_masks = []
+        output_images, output_masks = [], []
         w, h = None, None
 
-        excluded_formats = ['MPO']
-        
         for i in ImageSequence.Iterator(img):
             i = node_helpers.pillow(ImageOps.exif_transpose, i)
-
             if i.mode == 'I':
-                i = i.point(lambda i: i * (1 / 255))
+                i = i.point(lambda x: x * (1 / 255))
             image = i.convert("RGB")
 
-            if len(output_images) == 0:
-                w = image.size[0]
-                h = image.size[1]
+            if not output_images:
+                w, h = image.size
             
-            if image.size[0] != w or image.size[1] != h:
+            if image.size != (w, h):
                 continue
             
-            image = np.array(image).astype(np.float32) / 255.0
-            image = torch.from_numpy(image)[None,]
-            if 'A' in i.getbands():
-                mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
-                mask = 1. - torch.from_numpy(mask)
-            else:
-                mask = torch.zeros((64,64), dtype=torch.float32, device="cpu")
+            image = torch.from_numpy(np.array(image).astype(np.float32) / 255.0)[None,]
+            mask = (1. - torch.from_numpy(np.array(i.getchannel('A')).astype(np.float32) / 255.0)).unsqueeze(0) if 'A' in i.getbands() else torch.zeros((1, 64, 64), dtype=torch.float32)
             output_images.append(image)
-            output_masks.append(mask.unsqueeze(0))
+            output_masks.append(mask)
 
-        if len(output_images) > 1 and img.format not in excluded_formats:
-            output_image = torch.cat(output_images, dim=0)
-            output_mask = torch.cat(output_masks, dim=0)
-        else:
-            output_image = output_images[0]
-            output_mask = output_masks[0]
+        output_image = torch.cat(output_images, dim=0) if len(output_images) > 1 and img.format != 'MPO' else output_images[0]
+        output_mask = torch.cat(output_masks, dim=0) if len(output_masks) > 1 and img.format != 'MPO' else output_masks[0]
 
-        return (output_image, output_mask, w, h, f"{img.info}")
+        return output_image, output_mask, w, h, f"{img.info}"
 
     @classmethod
     def IS_CHANGED(s, image):
