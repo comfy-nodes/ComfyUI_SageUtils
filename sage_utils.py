@@ -156,6 +156,20 @@ def get_model_info(lora_path, weight = None):
         ret = {}
     return ret
     
+def get_latest_model_version(modelId):
+    json = get_civitai_model_json(modelId)
+    if 'error' in json:
+        return json['error']
+    
+    latest_model = None
+    model_date = None
+    for model in json["modelVersions"]:
+        if model_date is None or (datetime.datetime.fromisoformat(model['createdAt']) > model_date and model['status'] == "Published" and model['availability'] == "Public"):
+            model_date = datetime.datetime.fromisoformat(model['createdAt'])
+            latest_model = model["id"]
+        
+    return latest_model
+
 def pull_all_loras(the_path):
     the_paths = the_path[0]
     ret = []

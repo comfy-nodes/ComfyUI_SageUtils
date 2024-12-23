@@ -80,6 +80,61 @@ class Sage_GetInfoFromHash:
             return ("", "", "", "", "", "", "", "")
 
 
+class Sage_LastLoraInfo:
+    def __init__(self):
+        self.device = comfy.model_management.intermediate_device()
+        
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "lora_stack": ("LORA_STACK", {"defaultInput": True})
+            }
+        }
+    
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "IMAGE")
+    RETURN_NAMES = ("base_model", "name", "url", "latest_url", "image")
+
+    FUNCTION = "get_last_info"
+    
+    CATEGORY = "Sage Utils/util"
+    DESCRIPTION = "Take the last image in the stack, pull the civitai model info, and return what the base model is, the name with version, the url, the url for the latest version, and a preview image. Note that last model in the stack is not necessarily the one this node is hooked to, since that node may be disabled."
+    
+    def blank_image(self):
+        img = Image.new('RGB', (1024, 1024))
+        img = ImageOps.exif_transpose(img)
+        img = np.array(img.convert("RGB")).astype(np.float32) / 255.0
+        return (torch.from_numpy(img)[None,])
+    
+    def get_last_info(self, lora_stack):
+        if lora_stack is None:
+            return ("", "", "", "", None)
+        
+        last_lora = lora_stack[-1]
+        image = self.blank_image()
+        try:
+            hash = get_lora_hash(last_lora[0])
+            json_data = get_civitai_model_version_json(hash)
+            if "modelId" in json_data:
+                url = f"https://civitai.com/models/{json_data['modelId']}?modelVersionId={json_data['id']}"
+                latest_version = get_latest_model_version(json_data["modelId"])
+                latest_url = f"https://civitai.com/models/{json_data['modelId']}?modelVersionId={latest_version}"
+                image_urls = pull_lora_image_urls(hash, True)
+                image = url_to_torch_image(image_urls[0])
+            else:
+                url = ""
+                latest_url = ""
+            
+            return (
+                json_data.get("baseModel", ""),
+                json_data.get("model", {}).get("name", "") + " " + json_data.get("name", ""),
+                url,
+                latest_url,
+                image)
+        except:
+            print("Exception when getting json data.")
+            return ("", "", "", "", image)
+
 class Sage_GetPicturesFromHash:
     @classmethod
     def INPUT_TYPES(s):
@@ -177,7 +232,7 @@ class Sage_GetModelJSONFromHash:
     
     FUNCTION = "pull_json"
     CATEGORY = "Sage Utils/util"
-    DESCRIPTION = "Returns the JSON that civitai will give you, based on a hash. Useful if you want to see all the information, just what I'm using. This is the specific version hash."
+    DESCRIPTION = "Returns the JSON that civitai will give you, based on a hash. Useful if you want to see all the information, not just what I'm using. This is the specific version hash."
     def pull_json(self, hash):
         try:
             the_json = get_civitai_model_version_json(hash)
@@ -298,6 +353,7 @@ class Sage_ModelInfoFromModelId:
     def pull_model_json(self, model_id):
         try:
             model_json = get_civitai_model_json(model_id)
+            
             return (json.dumps(model_json, separators=(",", ":"), sort_keys=True, indent=4),)
         except:
             return ("{}",)

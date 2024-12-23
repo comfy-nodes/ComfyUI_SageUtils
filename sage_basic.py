@@ -158,8 +158,8 @@ class Sage_PonyPrefix:
         return {
             "required": {
                 "add_score": ("BOOLEAN", {"defaultInput": False}),
-                "rating": (["none", "safe", "questionable", "explicit"], {"defaultInput": "safe"}),
-                "source": (["none", "pony", "furry", "anime", "cartoon", "3d", "western", "comic", "monster"], {"defaultInput": "pony"}),
+                "rating": (["none", "safe", "questionable", "explicit"], {"defaultInput": False}),
+                "source": (["none", "pony", "furry", "anime", "cartoon", "3d", "western", "comic", "monster"], {"defaultInput": False}),
             },
             "optional": {
                 "prompt": ("STRING", {"defaultInput": True, "multiline": True})
