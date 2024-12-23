@@ -43,41 +43,6 @@ class Sage_CollectKeywordsFromLoraStack:
         ret = ", ".join(lora_keywords)
         ret = ' '.join(ret.split('\n'))
         return (ret,)
-    
-class Sage_GetInfoFromHash:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "hash": ("STRING", {"defaultInput": True})
-            }
-        }
-    
-    RETURN_TYPES = ("STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING", "STRING")
-    RETURN_NAMES = ("type", "base_model", "version_id", "model_id", "name", "version", "trained_words", "url")
-
-    FUNCTION = "get_info"
-    
-    CATEGORY = "Sage Utils/debug"
-    DESCRIPTION = "Pull out various useful pieces of information from a hash, such as the model and version id, the model name and version, what model it's based on, and what keywords it has."
-
-    def get_info(self, hash):
-        try:
-            json_data = get_civitai_model_version_json(hash)
-            words = ", ".join(json_data["trainedWords"]) if json_data["trainedWords"] else ""
-            return (
-                json_data["model"]["type"],
-                json_data["baseModel"],
-                str(json_data["id"]),
-                str(json_data["modelId"]),
-                json_data["model"]["name"],
-                json_data["name"],
-                words,
-                json_data["downloadUrl"],
-            )
-        except:
-            print("Exception when getting json data.")
-            return ("", "", "", "", "", "", "", "")
 
 class Sage_ModelInfo:
     @classmethod
@@ -169,38 +134,6 @@ class Sage_LastLoraInfo:
             print("Exception when getting json data.")
             return ("", "", "", "", image)
 
-class Sage_GetPicturesFromHash:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "hash": ("STRING", {"defaultInput": True}),
-                "explicit": ("BOOLEAN", {"defaultInput": False})
-            }
-        }
-    
-    RETURN_TYPES = ("IMAGE", )
-    RETURN_NAMES = ("image", )
-
-    FUNCTION = "get_pics"
-    
-    CATEGORY = "Sage Utils/debug"
-    DESCRIPTION = "Pull pics from civitai."
-
-    def get_pics(self, hash, explicit):
-        ret_urls = []
-
-        try:
-            ret_urls = pull_lora_image_urls(hash, explicit)
-        except:
-            print("Exception when getting json data.")
-            return([],)
-        
-        ret = url_to_torch_image(ret_urls[0])
-
-        return (ret,)
-    
-
 class Sage_PopulateCache:
     @classmethod
     def INPUT_TYPES(s):
@@ -237,8 +170,8 @@ class Sage_GetFileHash:
     
     FUNCTION = "get_hash"
     
-    CATEGORY = "Sage Utils/debug"
-    DESCRIPTION = "Get an sha256 hash of a file. Can be used for detecting models, civitai calls and such."
+    CATEGORY = "Sage Utils/util"
+    DESCRIPTION = "Get an sha256 hash of a file."
     
     def get_hash(self, base_dir, filename):
         the_hash = ""
@@ -367,27 +300,3 @@ class Sage_ModelReport:
         ret = json.dumps(sorted_models, separators=(",", ":"), sort_keys=True, indent=4)
         
         return (ret,)
-    
-class Sage_ModelInfoFromModelId:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "model_id": ("STRING", {"defaultInput": True})
-            }
-        }
-        
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("model_list",)
-    
-    FUNCTION = "pull_model_json"
-    CATEGORY = "Sage Utils/util"
-    DESCRIPTION = "Returns the model json, given a model id."
-    
-    def pull_model_json(self, model_id):
-        try:
-            model_json = get_civitai_model_json(model_id)
-            
-            return (json.dumps(model_json, separators=(",", ":"), sort_keys=True, indent=4),)
-        except:
-            return ("{}",)
