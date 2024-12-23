@@ -186,28 +186,6 @@ class Sage_GetFileHash:
         print(f"Hash for '{file_path}': {the_hash}")
         return (str(the_hash),)
 
-class Sage_GetModelJSONFromHash:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "hash": ("STRING", {"defaultInput": True})
-            }
-        }
-        
-    RETURN_TYPES = ("STRING",)
-    
-    FUNCTION = "pull_json"
-    CATEGORY = "Sage Utils/util"
-    DESCRIPTION = "Returns the JSON that civitai will give you, based on a hash. Useful if you want to see all the information, not just what I'm using. This is the specific version hash."
-    def pull_json(self, hash):
-        try:
-            the_json = get_civitai_model_version_json(hash)
-        except:
-            the_json = {}
-        return (json.dumps(the_json),)
-
-
 class Sage_ModelInfoBreakout:
     @classmethod
     def INPUT_TYPES(s):
