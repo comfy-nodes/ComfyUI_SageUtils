@@ -156,17 +156,19 @@ class Sage_LoraStackLoader:
         if not lora_stack:
             print("No lora stacks found. Warning: Passing 'None' to lora_stack output.")
             return model, clip, None
+        pbar = comfy.utils.ProgressBar(len(lora_stack))
 
         for lora in lora_stack:
             if lora:
                 model, clip = self.load_lora(model, clip, *lora)
+            pbar.update(1)
         return model, clip, lora_stack
     
 class Sage_LoadImage:
     @classmethod
     def INPUT_TYPES(s):
         files = sorted(str(x.relative_to(folder_paths.get_input_directory())) 
-                       for x in pathlib.Path(folder_paths.get_input_directory()).rglob('*') if x.is_file())
+                        for x in pathlib.Path(folder_paths.get_input_directory()).rglob('*') if x.is_file())
         return {"required": {"image": (files, {"image_upload": True})}}
 
     CATEGORY = "Sage Utils/loaders"

@@ -158,8 +158,8 @@ class Sage_PonyPrefix:
         return {
             "required": {
                 "add_score": ("BOOLEAN", {"defaultInput": False}),
-                "rating": (["safe", "questionable", "explicit"], {"defaultInput": False}),
-                "source": (["pony", "furry", "anime", "cartoon"], {"defaultInput": False}),
+                "rating": (["none", "safe", "questionable", "explicit"], {"defaultInput": "safe"}),
+                "source": (["none", "pony", "furry", "anime", "cartoon", "3d", "western", "comic", "monster"], {"defaultInput": "pony"}),
             },
             "optional": {
                 "prompt": ("STRING", {"defaultInput": True, "multiline": True})
@@ -173,7 +173,9 @@ class Sage_PonyPrefix:
 
     def create_prefix(self, add_score, rating, source, prompt=None):
         prefix = "score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, " if add_score else ""
-        prefix += f"source_{source}, rating_{rating}, {prompt or ''}"
+        prefix += f"source_{source}, " if source != "none" else ""
+        prefix += f"rating_{rating}, " if rating != "none" else ""
+        prefix += f"{prompt or ''}"
         return (prefix,)
 
 class Sage_ConditioningZeroOut:

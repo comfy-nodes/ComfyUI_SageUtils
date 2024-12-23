@@ -5,7 +5,7 @@ import pathlib
 import numpy as np
 import torch
 
-from PIL import Image, ImageOps
+from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
 # Pieces of ComfyUI that are being brought in for one reason or another.
@@ -38,13 +38,14 @@ class Sage_DualCLIPTextEncode:
     CATEGORY = "Sage Utils/clip"
     DESCRIPTION = "Turns a positive and negative prompt into conditionings, and passes through the prompts. Saves space over two CLIP Text Encoders, and zeros any input not hooked up."
 
-    def get_conditioning(self, clip, text=None):
+    def get_conditioning(self, pbar, clip, text=None):
         zero_text = text is None
         text = text or ""
 
         tokens = clip.tokenize(text)
         output = clip.encode_from_tokens(tokens, return_pooled=True, return_dict=True)
         cond = output.pop("cond")
+        pbar.update(1)
 
         if zero_text:
             pooled_output = output.get("pooled_output")
@@ -55,9 +56,10 @@ class Sage_DualCLIPTextEncode:
         return [[cond, output]]
 
     def encode(self, clip, pos=None, neg=None):
+        pbar = comfy.utils.ProgressBar(2)
         return (
-            self.get_conditioning(clip, pos),
-            self.get_conditioning(clip, neg),
+            self.get_conditioning(pbar, clip, pos),
+            self.get_conditioning(pbar, clip, neg),
             pos or "",
             neg or ""
         )

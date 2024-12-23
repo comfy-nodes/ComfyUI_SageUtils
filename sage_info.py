@@ -62,29 +62,22 @@ class Sage_GetInfoFromHash:
     DESCRIPTION = "Pull out various useful pieces of information from a hash, such as the model and version id, the model name and version, what model it's based on, and what keywords it has."
 
     def get_info(self, hash):
-        ret = []
-        path = ""
-
         try:
-            json = get_civitai_model_version_json(hash)
-            ret.append(json["model"]["type"])
-            ret.append(json["baseModel"])
-            ret.append(str(json["id"]))
-            ret.append(str(json["modelId"]))
-            ret.append(json["model"]["name"])
-            ret.append(json["name"])
-            words = json["trainedWords"]
-
-            if words == []:
-                ret.append("")
-            else:
-                ret.append(", ".join(words))
-            ret.append(json["downloadUrl"])
+            json_data = get_civitai_model_version_json(hash)
+            words = ", ".join(json_data["trainedWords"]) if json_data["trainedWords"] else ""
+            return (
+                json_data["model"]["type"],
+                json_data["baseModel"],
+                str(json_data["id"]),
+                str(json_data["modelId"]),
+                json_data["model"]["name"],
+                json_data["name"],
+                words,
+                json_data["downloadUrl"],
+            )
         except:
             print("Exception when getting json data.")
-            ret = ["", "", "", "", "", "", "", ""]
-        
-        return (ret[0], ret[1], ret[2], ret[3], ret[4], ret[5], ret[6], ret[7],)
+            return ("", "", "", "", "", "", "", "")
 
 
 class Sage_GetPicturesFromHash:
@@ -137,8 +130,7 @@ class Sage_PopulateCache:
     DESCRIPTION = "Calculates the hash of every model in the chosen directory and pulls civitai information. Takes forever. Returns the filenames."
     
     def get_files(self, base_dir):
-        ret = pull_all_loras(folder_paths.folder_names_and_paths[base_dir])
-        return (f"{ret}",)
+        return (str(pull_all_loras(folder_paths.folder_names_and_paths[base_dir])),)
 
 
 class Sage_GetFileHash:
