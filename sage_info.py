@@ -250,31 +250,34 @@ class Sage_ModelReport:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "type": (("LORA", "Checkpoint"), {"defaultInput": True})
+    #             "type": (("LORA", "Checkpoint"), {"defaultInput": True})
             }
         }
         
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("model_list",)
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("model_list", "lora_list")
     
     FUNCTION = "pull_list"
     CATEGORY = "Sage Utils/cache"
     DESCRIPTION = "Returns a list of models in the cache of the specified type, by base model type."
     
-    def pull_list(self, type):
+    def pull_list(self):
         sorted_models = {}
+        sorted_loras = {}
+        model_list = ""
+        lora_list = ""
         
         for model_path in cache.cache_data.keys():
-            if 'model' in cache.cache_data[model_path]:
-                if 'type' in cache.cache_data[model_path]['model']:
-                    if cache.cache_data[model_path]['model']['type'] == type:
-                        if 'baseModel' in cache.cache_data[model_path]:
-                            baseModel = cache.cache_data[model_path]['baseModel']
-                            if baseModel not in sorted_models:
-                                sorted_models[baseModel] = []
-                            
-                            sorted_models[baseModel].append(model_path)
-                        
-        ret = json.dumps(sorted_models, separators=(",", ":"), sort_keys=True, indent=4)
+            cur = cache.cache_data.get(model_path, {})
+            baseModel = cur.get('baseModel', None)
+            if cur.get('model', {}).get('type', None) == "Checkpoint":
+                if baseModel not in sorted_models: sorted_models[baseModel] = []
+                sorted_models[baseModel].append(model_path)
+            if cur.get('model', {}).get('type', None) == "LORA":
+                if baseModel not in sorted_loras: sorted_loras[baseModel] = []
+                sorted_loras[baseModel].append(model_path)
+
+        if sorted_models != {}: model_list = json.dumps(sorted_models, separators=(",", ":"), sort_keys=True, indent=4)
+        if sorted_loras != {}: lora_list = json.dumps(sorted_loras, separators=(",", ":"), sort_keys=True, indent=4)
         
-        return (ret,)
+        return (model_list, lora_list)
