@@ -203,6 +203,12 @@ def url_to_torch_image(url):
     img = np.array(img.convert("RGB")).astype(np.float32) / 255.0
     return (torch.from_numpy(img)[None,])
 
+def blank_image():
+    img = Image.new('RGB', (1024, 1024))
+    img = ImageOps.exif_transpose(img)
+    img = np.array(img.convert("RGB")).astype(np.float32) / 255.0
+    return (torch.from_numpy(img)[None,])
+    
 def get_recently_used_models(model_type):
         model_list = list()
         full_model_list = folder_paths.get_filename_list(model_type)
