@@ -43,7 +43,6 @@ NODE_CLASS_MAPPINGS = {
     "Sage_ConstructMetadataLite": Sage_ConstructMetadataLite,
     "Sage_SaveImageWithMetadata": Sage_SaveImageWithMetadata,
     "Sage_PonyPrefix": Sage_PonyPrefix,
-    "Sage_PopulateCache": Sage_PopulateCache,
     "Sage_CacheMaintenance": Sage_CacheMaintenance,
     "Sage_ModelReport": Sage_ModelReport
 }
@@ -79,9 +78,8 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_ConstructMetadataLite": "Construct Metadata Lite",
     "Sage_SaveImageWithMetadata": "Save Image w/ Added Metadata",
     "Sage_PonyPrefix": "Add Pony v6 Prefixes",
-    "Sage_PopulateCache": "Scan for Metadata & Hash",
     "Sage_CacheMaintenance": "Cache Maintenance",
-    "Sage_ModelReport": "Model Report"
+    "Sage_ModelReport": "Model Scan & Report"
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY'] 

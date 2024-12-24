@@ -170,21 +170,23 @@ def get_latest_model_version(modelId):
         
     return latest_model
 
-def pull_all_loras(the_path):
-    the_paths = the_path[0]
-    ret = []
-    for dir in the_paths:
-        result = list(p.resolve() for p in pathlib.Path(dir).glob("**/*") if p.suffix in {".safetensors", ".ckpt"})
-        ret.extend(result)
+def model_scan(the_path):
+    the_paths = the_path
+    
+    print(f"the_paths: {the_paths}")
 
-    ret = list(set(ret))
-    print(f"There are {len(ret)} files.")
-    pbar = comfy.utils.ProgressBar(len(ret))
-    for the_model in ret:
+    model_list = []
+    for dir in the_paths:
+        print(f"dir: {dir}")
+        result = list(p.resolve() for p in pathlib.Path(dir).glob("**/*") if p.suffix in {".safetensors", ".ckpt"})
+        model_list.extend(result)
+
+    model_list = list(set(model_list))
+    print(f"There are {len(model_list)} files.")
+    pbar = comfy.utils.ProgressBar(len(model_list))
+    for the_model in model_list:
         pbar.update(1)
         pull_metadata(str(the_model))
-    
-    return ret
 
 def pull_lora_image_urls(hash, nsfw):
     json = get_civitai_model_version_json(hash)

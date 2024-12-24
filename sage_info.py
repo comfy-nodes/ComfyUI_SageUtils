@@ -134,27 +134,6 @@ class Sage_LastLoraInfo:
             print("Exception when getting json data.")
             return ("", "", "", "", image)
 
-class Sage_PopulateCache:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "base_dir": (list(folder_paths.folder_names_and_paths.keys()), {"defaultInput": False}),
-            }
-        }
-        
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("list",)
-    
-    FUNCTION = "get_files"
-    
-    CATEGORY = "Sage Utils/cache"
-    DESCRIPTION = "Calculates the hash of every model in the chosen directory and pulls civitai information. Takes forever. Returns the filenames."
-    
-    def get_files(self, base_dir):
-        return (str(pull_all_loras(folder_paths.folder_names_and_paths[base_dir])),)
-
-
 class Sage_GetFileHash:
     @classmethod
     def INPUT_TYPES(s):
@@ -204,7 +183,7 @@ class Sage_ModelInfoBreakout:
 
     def model_breakout(self, model_info):
         return(model_info['path'], model_info['hash'])
-    
+
 class Sage_CacheMaintenance:
     @classmethod
     def INPUT_TYPES(s):
@@ -244,13 +223,12 @@ class Sage_CacheMaintenance:
 
         return (", ".join(ghost_entries), json.dumps(dup_hash, separators=(",", ":"), sort_keys=True, indent=4), json.dumps(dup_id, separators=(",", ":"), sort_keys=True, indent=4))
 
-
 class Sage_ModelReport:
     @classmethod
     def INPUT_TYPES(s):
         return {
             "required": {
-    #             "type": (("LORA", "Checkpoint"), {"defaultInput": True})
+                "scan_models": (("none", "loras", "checkpoints", "all"), {"defaultInput": False, "default": "none"}),
             }
         }
         
@@ -259,13 +237,30 @@ class Sage_ModelReport:
     
     FUNCTION = "pull_list"
     CATEGORY = "Sage Utils/cache"
-    DESCRIPTION = "Returns a list of models in the cache of the specified type, by base model type."
+    DESCRIPTION = "Calculates the hash of models & checkpoints & pulls civitai info if chosen. Returns a list of models in the cache of the specified type, by base model type."
+
+    def get_files(self, scan_models):
+        the_paths = []
+        if scan_models == "loras":
+            the_paths = folder_paths.get_folder_paths("loras")
+        elif scan_models == "checkpoints":
+            the_paths = folder_paths.get_folder_paths("checkpoints")
+        elif scan_models == "all":
+            the_lora_paths = folder_paths.get_folder_paths("loras")
+            the_checkpoint_paths = folder_paths.get_folder_paths("checkpoints")
+            the_paths = [*the_lora_paths, *the_checkpoint_paths]
+        
+        print(f"Scanning {len(the_paths)} paths.")
+        print(f"the_paths == {the_paths}")
+        if the_paths != []: model_scan(the_paths)
     
-    def pull_list(self):
+    def pull_list(self, scan_models):
         sorted_models = {}
         sorted_loras = {}
         model_list = ""
         lora_list = ""
+        
+        self.get_files(scan_models)
         
         for model_path in cache.cache_data.keys():
             cur = cache.cache_data.get(model_path, {})
