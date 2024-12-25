@@ -14,35 +14,50 @@ WEB_DIRECTORY = "./js"
 # A dictionary that contains all nodes you want to export with their names
 # NOTE: names should be globally unique
 NODE_CLASS_MAPPINGS = {
+    # Primitive nodes
     "Sage_SetBool": Sage_SetBool,
     "Sage_SetInteger": Sage_SetInteger,
     "Sage_SetFloat": Sage_SetFloat,
     "Sage_SetText": Sage_SetText,
     "Sage_JoinText": Sage_JoinText,
     "Sage_TripleJoinText": Sage_TripleJoinText,
-    "Sage_PonyPrefix": Sage_PonyPrefix,
     "Sage_ViewText": Sage_ViewText,
     "Sage_ConditioningZeroOut": Sage_ConditioningZeroOut,
-    "Sage_GetFileHash": Sage_GetFileHash,
-    "Sage_LastLoraInfo": Sage_LastLoraInfo,
-    "Sage_ModelInfo": Sage_ModelInfo,
-    "Sage_ModelInfoBreakout": Sage_ModelInfoBreakout,
-    "Sage_CollectKeywordsFromLoraStack": Sage_CollectKeywordsFromLoraStack,
-    "Sage_LoadImage": Sage_LoadImage,
-    "Sage_EmptyLatentImagePassthrough": Sage_EmptyLatentImagePassthrough,
+
+    # Loader nodes
     "Sage_UNETLoader": Sage_UNETLoader,
     "Sage_CheckpointLoaderSimple": Sage_CheckpointLoaderSimple,
     "Sage_CheckpointLoaderRecent": Sage_CheckpointLoaderRecent,
+    "Sage_LoraStackLoader": Sage_LoraStackLoader,
+    "Sage_LoadImage": Sage_LoadImage,
+    
+    # Lora stack nodes
     "Sage_LoraStack": Sage_LoraStack,
     "Sage_LoraStackRecent": Sage_LoraStackRecent,
-    "Sage_LoraStackLoader": Sage_LoraStackLoader,
+    "Sage_CollectKeywordsFromLoraStack": Sage_CollectKeywordsFromLoraStack,
+    
+    # Clip nodes
     "Sage_DualCLIPTextEncode": Sage_DualCLIPTextEncode,
-    "Sage_CacheMaintenance": Sage_CacheMaintenance,
-    "Sage_ModelReport": Sage_ModelReport,
+    
+    # Metadata nodes
     "Sage_SamplerInfo": Sage_SamplerInfo,
     "Sage_AdvSamplerInfo": Sage_AdvSamplerInfo,
     "Sage_ConstructMetadata": Sage_ConstructMetadata,
     "Sage_ConstructMetadataLite": Sage_ConstructMetadataLite,
+    
+    # Cache nodes
+    "Sage_CacheMaintenance": Sage_CacheMaintenance,
+    "Sage_ModelReport": Sage_ModelReport,
+    
+    # Utility nodes
+    "Sage_PonyPrefix": Sage_PonyPrefix,
+    "Sage_GetFileHash": Sage_GetFileHash,
+    "Sage_LastLoraInfo": Sage_LastLoraInfo,
+    "Sage_ModelInfo": Sage_ModelInfo,
+    "Sage_ModelInfoBreakout": Sage_ModelInfoBreakout,
+    "Sage_EmptyLatentImagePassthrough": Sage_EmptyLatentImagePassthrough,
+    
+    # Misc nodes
     "Sage_KSampler": Sage_KSampler,
     "Sage_SaveImageWithMetadata": Sage_SaveImageWithMetadata
 }
