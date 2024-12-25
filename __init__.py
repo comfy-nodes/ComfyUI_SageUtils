@@ -3,6 +3,7 @@ import ComfyUI_SageUtils.sage_utils
 import ComfyUI_SageUtils.sage_styles
 
 from .sage import *
+from .sage_metadata import *
 from .sage_basic import *
 from .sage_loaders import *
 from .sage_info import *
