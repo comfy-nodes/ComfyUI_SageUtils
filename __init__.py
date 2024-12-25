@@ -27,6 +27,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_UNETLoader": Sage_UNETLoader,
     "Sage_CheckpointLoaderSimple": Sage_CheckpointLoaderSimple,
     "Sage_CheckpointLoaderRecent": Sage_CheckpointLoaderRecent,
+    "Sage_ModelInfo": Sage_ModelInfo,
     "Sage_CacheMaintenance": Sage_CacheMaintenance,
     "Sage_ModelReport": Sage_ModelReport,
     
@@ -35,6 +36,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_LoraStackRecent": Sage_LoraStackRecent,
     "Sage_LoraStackLoader": Sage_LoraStackLoader,
     "Sage_CollectKeywordsFromLoraStack": Sage_CollectKeywordsFromLoraStack,
+    "Sage_LastLoraInfo": Sage_LastLoraInfo,
     
     # Clip nodes
     "Sage_DualCLIPTextEncode": Sage_DualCLIPTextEncode,
@@ -55,10 +57,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_ConstructMetadataLite": Sage_ConstructMetadataLite,
     
     # Utility nodes
-    "Sage_GetFileHash": Sage_GetFileHash,
-    "Sage_LastLoraInfo": Sage_LastLoraInfo,
-    "Sage_ModelInfo": Sage_ModelInfo,
-    "Sage_ModelInfoBreakout": Sage_ModelInfoBreakout,
+    "Sage_GetFileHash": Sage_GetFileHash
 
 }
 
@@ -80,6 +79,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_UNETLoader": "Load Diffusion Model w/ Metadata",
     "Sage_CheckpointLoaderSimple": "Load Checkpoint w/ Metadata",
     "Sage_CheckpointLoaderRecent": "Load Recently Used Checkpoint",
+    "Sage_ModelInfo": "Model Info",
     "Sage_CacheMaintenance": "Cache Maintenance",
     "Sage_ModelReport": "Model Scan & Report",
     
@@ -88,6 +88,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_LoraStackRecent": "Recent Lora Stack",
     "Sage_LoraStackLoader": "Lora Stack Loader",
     "Sage_CollectKeywordsFromLoraStack": "Lora Stack -> Keywords",
+    "Sage_LastLoraInfo": "Last Lora Info",
     
     # Clip nodes
     "Sage_ConditioningZeroOut": "Zero Conditioning",
@@ -108,10 +109,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_ConstructMetadataLite": "Construct Metadata Lite",
     
     # Utility nodes
-    "Sage_GetFileHash": "Get Sha256 Hash",
-    "Sage_LastLoraInfo": "Last Lora Info",
-    "Sage_ModelInfo": "Model Info",
-    "Sage_ModelInfoBreakout": "model_info -> Path and Hash"
+    "Sage_GetFileHash": "Get Sha256 Hash"
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY'] 

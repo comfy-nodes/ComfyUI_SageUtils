@@ -20,7 +20,7 @@ class Sage_ModelInfo:
 
     FUNCTION = "get_last_info"
     
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/model"
     DESCRIPTION = "Pull the civitai model info, and return what the base model is, the name with version, the url, the url for the latest version, and a preview image. Note that last model in the stack is not necessarily the one this node is hooked to, since that node may be disabled."
     
     def get_last_info(self, model_info):
@@ -64,7 +64,7 @@ class Sage_LastLoraInfo:
 
     FUNCTION = "get_last_info"
     
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/lora"
     DESCRIPTION = "Take the last lora in the stack, pull the civitai model info, and return what the base model is, the name with version, the url, the url for the latest version, and a preview image. Note that last model in the stack is not necessarily the one this node is hooked to, since that node may be disabled."
     
     def get_last_info(self, lora_stack):
@@ -126,22 +126,3 @@ class Sage_GetFileHash:
         
         print(f"Hash for '{file_path}': {the_hash}")
         return (str(the_hash),)
-
-class Sage_ModelInfoBreakout:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": {
-                "model_info": ("MODEL_INFO", {"defaultInput": True})
-            }
-        }
-        
-    RETURN_TYPES = ("STRING","STRING")
-    RETURN_NAMES = ("path", "hash")
-    
-    FUNCTION = "model_breakout"
-    CATEGORY = "Sage Utils/util"
-    DESCRIPTION = "Breaks down the model info output into the path and hash."
-
-    def model_breakout(self, model_info):
-        return(model_info['path'], model_info['hash'])
