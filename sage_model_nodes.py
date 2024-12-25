@@ -6,6 +6,7 @@ import ComfyUI_SageUtils.sage_cache as cache
 import torch
 import pathlib
 import numpy as np
+import json
 from PIL import Image, ImageOps, ImageSequence
 from PIL.PngImagePlugin import PngInfo
 
@@ -112,57 +113,6 @@ class Sage_UNETLoader:
 
         model = comfy.sd.load_diffusion_model(model_info["path"], model_options=model_options)
         return model, model_info
-
-# Modified version of the main lora loader.
-class Sage_LoraStackLoader:
-    def __init__(self):
-        self.loaded_lora = None
-
-    @classmethod
-    def INPUT_TYPES(s):
-        return {
-            "required": { 
-                "model": ("MODEL", {"tooltip": "The diffusion model the LoRA will be applied to."}),
-                "clip": ("CLIP", {"tooltip": "The CLIP model the LoRA will be applied to."})
-            },
-            "optional": {
-                "lora_stack": ("LORA_STACK", {"defaultInput": True})
-            }
-        }
-    
-    RETURN_TYPES = ("MODEL", "CLIP", "LORA_STACK")
-    OUTPUT_TOOLTIPS = ("The modified diffusion model.", "The modified CLIP model.", "The stack of loras.")
-    FUNCTION = "load_loras"
-
-    CATEGORY = "Sage Utils/lora"
-    DESCRIPTION = "Accept a lora_stack with Model and Clip, and apply all the loras in the stack at once."
-
-    def load_lora(self, model, clip, lora_name, strength_model, strength_clip):
-        if not (strength_model or strength_clip):
-            return model, clip
-
-        lora_path = folder_paths.get_full_path_or_raise("loras", lora_name)
-        
-        if self.loaded_lora and self.loaded_lora[0] == lora_path:
-            lora = self.loaded_lora[1]
-        else:
-            pull_metadata(lora_path, True)
-            lora = comfy.utils.load_torch_file(lora_path, safe_load=True)
-            self.loaded_lora = (lora_path, lora)
-
-        return comfy.sd.load_lora_for_models(model, clip, lora, strength_model, strength_clip)
-    
-    def load_loras(self, model, clip, lora_stack=None):
-        if not lora_stack:
-            print("No lora stacks found. Warning: Passing 'None' to lora_stack output.")
-            return model, clip, None
-        pbar = comfy.utils.ProgressBar(len(lora_stack))
-
-        for lora in lora_stack:
-            if lora:
-                model, clip = self.load_lora(model, clip, *lora)
-            pbar.update(1)
-        return model, clip, lora_stack
     
 class Sage_LoadImage:
     @classmethod
@@ -220,3 +170,96 @@ class Sage_LoadImage:
             return "Invalid image file: {}".format(image)
 
         return True
+
+class Sage_CacheMaintenance:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "remove_ghost_entries": ("BOOLEAN", {"defaultInput": True})
+            }
+        }
+        
+    RETURN_TYPES = ("STRING", "STRING", "STRING")
+    RETURN_NAMES = ("ghost_entries", "dup_hash","dup_model")
+    
+    FUNCTION = "cache_maintenance"
+    CATEGORY = "Sage Utils/model"
+    DESCRIPTION = "Lets you remove entries for models that are no longer there. dup_hash returns a list of files with the same hash, and dup_model returns ones with the same civitai model id (but not neccessarily the same version)."
+
+    def cache_maintenance(self, remove_ghost_entries):
+        ghost_entries = [path for path in cache.cache_data if not pathlib.Path(path).is_file()]
+        cache_by_hash = {}
+        cache_by_id = {}
+        dup_hash = {}
+        dup_id = {}
+
+        for model_path, data in cache.cache_data.items():
+            if 'hash' in data:
+                cache_by_hash.setdefault(data['hash'], []).append(model_path)
+            if 'modelId' in data:
+                cache_by_id.setdefault(data['modelId'], []).append(model_path)
+
+        if remove_ghost_entries:
+            for ghost in ghost_entries:
+                cache.cache_data.pop(ghost)
+            cache.save_cache()
+
+        dup_hash = {h: paths for h, paths in cache_by_hash.items() if len(paths) > 1}
+        dup_id = {i: paths for i, paths in cache_by_id.items() if len(paths) > 1}
+
+        return (", ".join(ghost_entries), json.dumps(dup_hash, separators=(",", ":"), sort_keys=True, indent=4), json.dumps(dup_id, separators=(",", ":"), sort_keys=True, indent=4))
+
+class Sage_ModelReport:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "scan_models": (("none", "loras", "checkpoints", "all"), {"defaultInput": False, "default": "none"}),
+            }
+        }
+        
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("model_list", "lora_list")
+    
+    FUNCTION = "pull_list"
+    CATEGORY = "Sage Utils/model"
+    DESCRIPTION = "Calculates the hash of models & checkpoints & pulls civitai info if chosen. Returns a list of models in the cache of the specified type, by base model type."
+
+    def get_files(self, scan_models):
+        the_paths = []
+        if scan_models == "loras":
+            the_paths = folder_paths.get_folder_paths("loras")
+        elif scan_models == "checkpoints":
+            the_paths = folder_paths.get_folder_paths("checkpoints")
+        elif scan_models == "all":
+            the_lora_paths = folder_paths.get_folder_paths("loras")
+            the_checkpoint_paths = folder_paths.get_folder_paths("checkpoints")
+            the_paths = [*the_lora_paths, *the_checkpoint_paths]
+        
+        print(f"Scanning {len(the_paths)} paths.")
+        print(f"the_paths == {the_paths}")
+        if the_paths != []: model_scan(the_paths)
+    
+    def pull_list(self, scan_models):
+        sorted_models = {}
+        sorted_loras = {}
+        model_list = ""
+        lora_list = ""
+        
+        self.get_files(scan_models)
+        
+        for model_path in cache.cache_data.keys():
+            cur = cache.cache_data.get(model_path, {})
+            baseModel = cur.get('baseModel', None)
+            if cur.get('model', {}).get('type', None) == "Checkpoint":
+                if baseModel not in sorted_models: sorted_models[baseModel] = []
+                sorted_models[baseModel].append(model_path)
+            if cur.get('model', {}).get('type', None) == "LORA":
+                if baseModel not in sorted_loras: sorted_loras[baseModel] = []
+                sorted_loras[baseModel].append(model_path)
+
+        if sorted_models != {}: model_list = json.dumps(sorted_models, separators=(",", ":"), sort_keys=True, indent=4)
+        if sorted_loras != {}: lora_list = json.dumps(sorted_loras, separators=(",", ":"), sort_keys=True, indent=4)
+        
+        return (model_list, lora_list)

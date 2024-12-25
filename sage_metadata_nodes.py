@@ -1,5 +1,7 @@
 import comfy
 import folder_paths
+import nodes
+import cli_args
 
 from .sage_helpers import *
 import ComfyUI_SageUtils.sage_cache as cache
@@ -7,6 +9,7 @@ import ComfyUI_SageUtils.sage_cache as cache
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 import numpy as np
+import os
 
 class Sage_SamplerInfo:
     def __init__(self):

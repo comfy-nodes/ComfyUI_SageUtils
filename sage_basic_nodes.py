@@ -225,3 +225,50 @@ class Sage_EmptyLatentImagePassthrough:
         size = 16 if sd3 else 4
         latent = torch.zeros([batch_size, size, height // 8, width // 8], device=self.device)
         return ({"samples": latent}, width, height)
+
+class Sage_DualCLIPTextEncode:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "clip": ("CLIP", {"defaultInput": True, "tooltip": "The CLIP model used for encoding the text."})
+            },
+            "optional": {
+                "pos": ("STRING", {"defaultInput": True, "multiline": True, "dynamicPrompts": True, "tooltip": "The positive prompt's text."}), 
+                "neg": ("STRING", {"defaultInput": True, "multiline": True, "dynamicPrompts": True, "tooltip": "The negative prompt's text."}),
+            }
+        }
+    RETURN_TYPES = ("CONDITIONING", "CONDITIONING", "STRING", "STRING")
+    RETURN_NAMES = ("pos_cond", "neg_cond", "pos_text", "neg_text")
+    
+    OUTPUT_TOOLTIPS = ("A conditioning containing the embedded text used to guide the diffusion model. If neg is not hooked up, it'll be automatically zeroed.",)
+    FUNCTION = "encode"
+
+    CATEGORY = "Sage Utils/clip"
+    DESCRIPTION = "Turns a positive and negative prompt into conditionings, and passes through the prompts. Saves space over two CLIP Text Encoders, and zeros any input not hooked up."
+
+    def get_conditioning(self, pbar, clip, text=None):
+        zero_text = text is None
+        text = text or ""
+
+        tokens = clip.tokenize(text)
+        output = clip.encode_from_tokens(tokens, return_pooled=True, return_dict=True)
+        cond = output.pop("cond")
+        pbar.update(1)
+
+        if zero_text:
+            pooled_output = output.get("pooled_output")
+            if pooled_output is not None:
+                output["pooled_output"] = torch.zeros_like(pooled_output)
+            return [[torch.zeros_like(cond), output]]
+            
+        return [[cond, output]]
+
+    def encode(self, clip, pos=None, neg=None):
+        pbar = comfy.utils.ProgressBar(2)
+        return (
+            self.get_conditioning(pbar, clip, pos),
+            self.get_conditioning(pbar, clip, neg),
+            pos or "",
+            neg or ""
+        )
