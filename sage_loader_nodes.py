@@ -1,6 +1,6 @@
 # File for any loader nodes. Separating out as the number is likely to grow.
 
-from .sage_utils import *
+from .sage_helpers import *
 import ComfyUI_SageUtils.sage_cache as cache
 
 import torch

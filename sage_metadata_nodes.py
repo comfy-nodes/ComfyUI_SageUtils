@@ -1,7 +1,7 @@
 import comfy
 import folder_paths
 
-from .sage_utils import *
+from .sage_helpers import *
 import ComfyUI_SageUtils.sage_cache as cache
 
 from PIL import Image

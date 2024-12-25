@@ -1,12 +1,12 @@
 import ComfyUI_SageUtils.sage_cache
-import ComfyUI_SageUtils.sage_utils
+import ComfyUI_SageUtils.sage_helpers
 import ComfyUI_SageUtils.sage_styles
 
 from .sage import *
-from .sage_metadata import *
-from .sage_basic import *
-from .sage_loaders import *
-from .sage_info import *
+from .sage_metadata_nodes import *
+from .sage_basic_nodes import *
+from .sage_loader_nodes import *
+from .sage_info_nodes import *
 
 sage_cache.load_cache()
 sage_styles.load_styles()
