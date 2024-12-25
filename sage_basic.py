@@ -80,7 +80,7 @@ class Sage_SetText:
     
     FUNCTION = "pass_str"
     
-    CATEGORY = "Sage Utils/primitives"
+    CATEGORY = "Sage Utils/text"
     DESCRIPTION = "Sets some text."
     
     def pass_str(self, str, prefix=None, suffix=None):
@@ -102,7 +102,7 @@ class Sage_JoinText:
     
     FUNCTION = "join_str"
     
-    CATEGORY = "Sage Utils/primitives"
+    CATEGORY = "Sage Utils/text"
     DESCRIPTION = "Joins two strings with a separator."
     
     def join_str(self, separator, str1, str2):
@@ -125,7 +125,7 @@ class Sage_TripleJoinText:
     
     FUNCTION = "join_str"
     
-    CATEGORY = "Sage Utils/primitives"
+    CATEGORY = "Sage Utils/text"
     DESCRIPTION = "Joins three strings with a separator."
     
     def join_str(self, separator, str1, str2, str3):
@@ -144,7 +144,7 @@ class Sage_ViewText:
     
     FUNCTION = "show_text"
     
-    CATEGORY = "Sage Utils/primitives"
+    CATEGORY = "Sage Utils/text"
     DESCRIPTION = "Shows some text."
     OUTPUT_NODE = True
     
@@ -169,7 +169,7 @@ class Sage_PonyPrefix:
     RETURN_TYPES = ("STRING",)
 
     FUNCTION = "create_prefix"
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/text"
 
     def create_prefix(self, add_score, rating, source, prompt=None):
         prefix = "score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, " if add_score else ""
@@ -190,7 +190,7 @@ class Sage_ConditioningZeroOut:
     RETURN_TYPES = ("CONDITIONING",)
     FUNCTION = "zero_out"
 
-    CATEGORY = "Sage Utils/primitives"
+    CATEGORY = "Sage Utils/clip"
     DESCRIPTION = "Returns zeroed out conditioning."
     def zero_out(self, clip):
         tokens = clip.tokenize("")
@@ -218,7 +218,7 @@ class Sage_EmptyLatentImagePassthrough:
     OUTPUT_TOOLTIPS = ("The empty latent image batch.", "pass through the image width", "pass through the image height")
     FUNCTION = "generate"
 
-    CATEGORY = "Sage Utils/util"
+    CATEGORY = "Sage Utils/image"
     DESCRIPTION = "Create a new batch of empty latent images to be denoised via sampling."
 
     def generate(self, width, height, batch_size=1, sd3=False):

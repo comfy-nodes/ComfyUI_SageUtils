@@ -197,7 +197,7 @@ class Sage_CacheMaintenance:
     RETURN_NAMES = ("ghost_entries", "dup_hash","dup_model")
     
     FUNCTION = "cache_maintenance"
-    CATEGORY = "Sage Utils/cache"
+    CATEGORY = "Sage Utils/model"
     DESCRIPTION = "Lets you remove entries for models that are no longer there. dup_hash returns a list of files with the same hash, and dup_model returns ones with the same civitai model id (but not neccessarily the same version)."
 
     def cache_maintenance(self, remove_ghost_entries):
@@ -236,7 +236,7 @@ class Sage_ModelReport:
     RETURN_NAMES = ("model_list", "lora_list")
     
     FUNCTION = "pull_list"
-    CATEGORY = "Sage Utils/cache"
+    CATEGORY = "Sage Utils/model"
     DESCRIPTION = "Calculates the hash of models & checkpoints & pulls civitai info if chosen. Returns a list of models in the cache of the specified type, by base model type."
 
     def get_files(self, scan_models):

@@ -141,7 +141,7 @@ class Sage_KSampler:
     OUTPUT_TOOLTIPS = ("The denoised latent.",)
     FUNCTION = "sample"
 
-    CATEGORY = "Sage Utils"
+    CATEGORY = "Sage Utils/sampler"
     DESCRIPTION = "Uses the provided model, positive and negative conditioning to denoise the latent image. Designed to work with the Sampler info node."
 
     def sample(self, model, sampler_info, positive, negative, latent_image, denoise=1.0, advanced_info = None):
@@ -372,7 +372,7 @@ class Sage_SaveImageWithMetadata:
 
     OUTPUT_NODE = True
 
-    CATEGORY = "Sage Utils"
+    CATEGORY = "Sage Utils/image"
     DESCRIPTION = "Saves the input images to your ComfyUI output directory with added metadata. The param_metadata input should come from Construct Metadata, and the extra_metadata is anything you want. Both are just strings, though, with the difference being that the first has a keyword of parameters, and the second, extra, so technically you could pass in your own metadata, or even type it in in a Set Text node and hook that to this node."
 
     def set_metadata(self, include_node_metadata, include_extra_pnginfo_metadata, param_metadata = None, extra_metadata=None, prompt=None, extra_pnginfo=None):

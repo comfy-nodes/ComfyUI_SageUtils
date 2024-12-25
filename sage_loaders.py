@@ -36,7 +36,7 @@ class Sage_CheckpointLoaderRecent:
                     "The model path and hash, all in one output.")
     FUNCTION = "load_checkpoint"
 
-    CATEGORY  =  "Sage Utils/loaders"
+    CATEGORY  =  "Sage Utils/model"
     DESCRIPTION = "Loads a diffusion model checkpoint. Also returns a model_info output to pass to the construct metadata node, and the hash. (And hashes and pulls civitai info for the file.)"
 
     def load_checkpoint(self, ckpt_name):
@@ -68,7 +68,7 @@ class Sage_CheckpointLoaderSimple:
                     "The model path and hash, all in one output.")
     FUNCTION = "load_checkpoint"
 
-    CATEGORY  =  "Sage Utils/loaders"
+    CATEGORY  =  "Sage Utils/model"
     DESCRIPTION = "Loads a diffusion model checkpoint. Also returns a model_info output to pass to the construct metadata node, and the hash. (And hashes and pulls civitai info for the file.)"
 
     def load_checkpoint(self, ckpt_name):
@@ -91,7 +91,7 @@ class Sage_UNETLoader:
     RETURN_NAMES = ("model", "model_info")
 
     FUNCTION = "load_unet"
-    CATEGORY  =  "Sage Utils/loaders"
+    CATEGORY  =  "Sage Utils/model"
 
     def load_unet(self, unet_name, weight_dtype):
         dtype_map = {
@@ -134,7 +134,7 @@ class Sage_LoraStackLoader:
     OUTPUT_TOOLTIPS = ("The modified diffusion model.", "The modified CLIP model.", "The stack of loras.")
     FUNCTION = "load_loras"
 
-    CATEGORY = "Sage Utils/loaders"
+    CATEGORY = "Sage Utils/lora"
     DESCRIPTION = "Accept a lora_stack with Model and Clip, and apply all the loras in the stack at once."
 
     def load_lora(self, model, clip, lora_name, strength_model, strength_clip):
@@ -171,7 +171,7 @@ class Sage_LoadImage:
                         for x in pathlib.Path(folder_paths.get_input_directory()).rglob('*') if x.is_file())
         return {"required": {"image": (files, {"image_upload": True})}}
 
-    CATEGORY = "Sage Utils/loaders"
+    CATEGORY = "Sage Utils/image"
 
     RETURN_TYPES = ("IMAGE", "MASK", "INT", "INT", "STRING")
     RETURN_NAMES = ("image", "mask", "width", "height", "metadata")
