@@ -16,6 +16,11 @@ import comfy.utils
 
 import ComfyUI_SageUtils.sage_cache as cache
 
+# from https://github.com/pythongosssss/ComfyUI-Custom-Scripts
+class AnyType(str):
+    def __ne__(self, __value: object) -> bool:
+        return False
+
 def name_from_path(path):
     return pathlib.Path(path).name
 

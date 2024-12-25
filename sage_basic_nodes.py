@@ -2,6 +2,8 @@ import torch
 import comfy
 import nodes
 
+from .sage_helpers import *
+
 class Sage_SetBool:
     @classmethod
     def INPUT_TYPES(s):
@@ -61,6 +63,32 @@ class Sage_SetFloat:
     
     def pass_float(self, float):
         return (float,)
+
+class Sage_LogicalSwitch:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "condition": ("BOOLEAN", {"defaultInput": False}),
+                "true_value": (AnyType("*"),{"defaultInput": False}),
+                "false_value": (AnyType("*"),{"defaultInput": False})
+            }
+        }
+    
+    @classmethod
+    def VALIDATE_INPUTS(s, input_types):
+        return True
+
+    RETURN_TYPES = (AnyType("*"),)
+    RETURN_NAMES = ("result",)
+    
+    FUNCTION = "if_else"
+    
+    CATEGORY = "Sage Utils/logic"
+    DESCRIPTION = "Returns one of two values based on a condition."
+    
+    def if_else(self, condition, true_value, false_value):
+        return (true_value if condition else false_value,)
 
 class Sage_SetText:
     @classmethod

@@ -16,6 +16,9 @@ NODE_CLASS_MAPPINGS = {
     "Sage_SetInteger": Sage_SetInteger,
     "Sage_SetFloat": Sage_SetFloat,
     
+    # Logic nodes
+    "Sage_LogicalSwitch": Sage_LogicalSwitch,
+    
     # Text nodes
     "Sage_SetText": Sage_SetText,
     "Sage_JoinText": Sage_JoinText,
@@ -67,6 +70,9 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_SetBool": "Set Bool",
     "Sage_SetInteger": "Set Integer",
     "Sage_SetFloat": "Set Float",
+    
+    #Logic nodes
+    "Sage_LogicalSwitch": "Switch",
     
     # Text nodes
     "Sage_SetText": "Set Text",
