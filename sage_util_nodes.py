@@ -5,8 +5,9 @@ import json
 from .sage_helpers import *
 import ComfyUI_SageUtils.sage_cache as cache
 import folder_paths
+from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
-class Sage_ModelInfo:
+class Sage_ModelInfo(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -50,7 +51,7 @@ class Sage_ModelInfo:
             print("Exception when getting json data.")
             return ("", "", "", "", image)
 
-class Sage_LastLoraInfo:
+class Sage_LastLoraInfo(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -96,7 +97,7 @@ class Sage_LastLoraInfo:
             print("Exception when getting json data.")
             return ("", "", "", "", image)
 
-class Sage_GetFileHash:
+class Sage_GetFileHash(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {

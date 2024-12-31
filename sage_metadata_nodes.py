@@ -2,6 +2,7 @@ import comfy
 import folder_paths
 import nodes
 import cli_args
+from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
 from .sage_helpers import *
 import ComfyUI_SageUtils.sage_cache as cache
@@ -11,7 +12,7 @@ from PIL.PngImagePlugin import PngInfo
 import numpy as np
 import os
 
-class Sage_SamplerInfo:
+class Sage_SamplerInfo(ComfyNodeABC):
     def __init__(self):
         pass
     
@@ -37,7 +38,7 @@ class Sage_SamplerInfo:
     def pass_info(self, seed, steps, cfg, sampler_name, scheduler):
         return {"seed": seed, "steps": steps, "cfg": cfg, "sampler": sampler_name, "scheduler": scheduler},
 
-class Sage_AdvSamplerInfo:
+class Sage_AdvSamplerInfo(ComfyNodeABC):
     def __init__(self):
         pass
     
@@ -67,7 +68,7 @@ class Sage_AdvSamplerInfo:
         s_info["return_with_leftover_noise"] = return_with_leftover_noise
         return s_info,
 
-class Sage_KSampler:
+class Sage_KSampler(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -104,7 +105,7 @@ class Sage_KSampler:
             disable_noise = True
         return nodes.common_ksampler(model, sampler_info["seed"], sampler_info["steps"], sampler_info["cfg"], sampler_info["sampler"],  sampler_info["scheduler"], positive, negative, latent_image, denoise=denoise, disable_noise=disable_noise, start_step=advanced_info['start_at_step'], last_step=advanced_info['end_at_step'], force_full_denoise=force_full_denoise)
 
-class Sage_ConstructMetadata:
+class Sage_ConstructMetadata(ComfyNodeABC):
     def __init__(self):
         pass
     
@@ -168,7 +169,7 @@ class Sage_ConstructMetadata:
         return metadata,
 
 
-class Sage_ConstructMetadataLite:
+class Sage_ConstructMetadataLite(ComfyNodeABC):
     def __init__(self):
         pass
     
@@ -220,7 +221,7 @@ class Sage_ConstructMetadataLite:
         return metadata,
 
 # An altered version of Save Image
-class Sage_SaveImageWithMetadata:
+class Sage_SaveImageWithMetadata(ComfyNodeABC):
     def __init__(self):
         self.output_dir = folder_paths.get_output_directory()
         self.type = "output"

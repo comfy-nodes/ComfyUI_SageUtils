@@ -10,6 +10,7 @@
 
 from .sage_helpers import *
 import ComfyUI_SageUtils.sage_cache as cache
+from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
 from .sage_metadata_nodes import *
 from .sage_basic_nodes import *

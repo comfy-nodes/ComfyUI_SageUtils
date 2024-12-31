@@ -14,9 +14,10 @@ from PIL.PngImagePlugin import PngInfo
 import comfy
 import folder_paths
 import node_helpers
+from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
 
-class Sage_CheckpointLoaderRecent:
+class Sage_CheckpointLoaderRecent(ComfyNodeABC):
     def __init__(self):
         pass
     
@@ -50,7 +51,7 @@ class Sage_CheckpointLoaderRecent:
         result = (*out[:3], model_info)
         return (result)
     
-class Sage_CheckpointLoaderSimple:
+class Sage_CheckpointLoaderSimple(ComfyNodeABC):
     def __init__(self):
         pass
     
@@ -82,7 +83,7 @@ class Sage_CheckpointLoaderSimple:
         result = (*out[:3], model_info)
         return (result)
 
-class Sage_UNETLoader:
+class Sage_UNETLoader(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { "unet_name": (folder_paths.get_filename_list("diffusion_models"), ),
@@ -114,7 +115,7 @@ class Sage_UNETLoader:
         model = comfy.sd.load_diffusion_model(model_info["path"], model_options=model_options)
         return model, model_info
     
-class Sage_LoadImage:
+class Sage_LoadImage(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         files = sorted(str(x.relative_to(folder_paths.get_input_directory())) 
@@ -171,7 +172,7 @@ class Sage_LoadImage:
 
         return True
 
-class Sage_CacheMaintenance:
+class Sage_CacheMaintenance(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -210,7 +211,7 @@ class Sage_CacheMaintenance:
 
         return (", ".join(ghost_entries), json.dumps(dup_hash, separators=(",", ":"), sort_keys=True, indent=4), json.dumps(dup_id, separators=(",", ":"), sort_keys=True, indent=4))
 
-class Sage_ModelReport:
+class Sage_ModelReport(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {

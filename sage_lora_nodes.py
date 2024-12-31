@@ -3,8 +3,9 @@ import ComfyUI_SageUtils.sage_cache as cache
 
 import comfy
 import folder_paths
+from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
-class Sage_LoraStackRecent:
+class Sage_LoraStackRecent(ComfyNodeABC):
     def __init__(self):
         pass
 
@@ -39,7 +40,7 @@ class Sage_LoraStackRecent:
         return (stack,)
 
 
-class Sage_LoraStack:
+class Sage_LoraStack(ComfyNodeABC):
     def __init__(self):
         pass
 
@@ -72,7 +73,7 @@ class Sage_LoraStack:
 
         return (stack,)
 
-class Sage_CollectKeywordsFromLoraStack:
+class Sage_CollectKeywordsFromLoraStack(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -111,7 +112,7 @@ class Sage_CollectKeywordsFromLoraStack:
         return (ret,)
 
 # Modified version of the main lora loader.
-class Sage_LoraStackLoader:
+class Sage_LoraStackLoader(ComfyNodeABC):
     def __init__(self):
         self.loaded_lora = None
 

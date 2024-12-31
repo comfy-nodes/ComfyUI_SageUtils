@@ -1,10 +1,11 @@
 import torch
 import comfy
 import nodes
+from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
 from .sage_helpers import *
 
-class Sage_SetBool:
+class Sage_SetBool(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -24,7 +25,7 @@ class Sage_SetBool:
     def pass_bool(self, bool):
         return (bool,)
     
-class Sage_SetInteger:
+class Sage_SetInteger(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -44,7 +45,7 @@ class Sage_SetInteger:
     def pass_int(self, int):
         return (int,)
     
-class Sage_SetFloat:
+class Sage_SetFloat(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -64,7 +65,7 @@ class Sage_SetFloat:
     def pass_float(self, float):
         return (float,)
 
-class Sage_LogicalSwitch:
+class Sage_LogicalSwitch(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -90,7 +91,7 @@ class Sage_LogicalSwitch:
     def if_else(self, condition, true_value, false_value):
         return (true_value if condition else false_value,)
 
-class Sage_SetText:
+class Sage_SetText(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -114,7 +115,7 @@ class Sage_SetText:
     def pass_str(self, str, prefix=None, suffix=None):
         return (f"{prefix or ''}{str}{suffix or ''}",)
 
-class Sage_JoinText:
+class Sage_JoinText(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -136,7 +137,7 @@ class Sage_JoinText:
     def join_str(self, separator, str1, str2):
         return (separator.join([str1, str2]),)
 
-class Sage_TripleJoinText:
+class Sage_TripleJoinText(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -159,7 +160,7 @@ class Sage_TripleJoinText:
     def join_str(self, separator, str1, str2, str3):
         return (separator.join([str1, str2, str3]),)
 
-class Sage_ViewText:
+class Sage_ViewText(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -180,7 +181,7 @@ class Sage_ViewText:
         print(f"String is '{text}'")
         return { "ui": {"text": text}, "result" : (text,) }
 
-class Sage_PonyPrefix:
+class Sage_PonyPrefix(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -206,7 +207,7 @@ class Sage_PonyPrefix:
         prefix += f"{prompt or ''}"
         return (prefix,)
 
-class Sage_ConditioningZeroOut:
+class Sage_ConditioningZeroOut(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -227,7 +228,7 @@ class Sage_ConditioningZeroOut:
         conditioning = torch.zeros_like(output.pop("cond"))
         return [([conditioning, output],)]
 
-class Sage_ConditioningOneOut:
+class Sage_ConditioningOneOut(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -251,7 +252,7 @@ class Sage_ConditioningOneOut:
         conditioning = torch.ones_like(output.pop("cond"))
         return [([conditioning, output],)]
     
-class Sage_ConditioningRngOut:
+class Sage_ConditioningRngOut(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -277,7 +278,7 @@ class Sage_ConditioningRngOut:
         conditioning = torch.rand_like(output.pop("cond"))
         return [([conditioning, output],)]  
 
-class Sage_EmptyLatentImagePassthrough:
+class Sage_EmptyLatentImagePassthrough(ComfyNodeABC):
     def __init__(self):
         self.device = comfy.model_management.intermediate_device()
 
@@ -304,7 +305,7 @@ class Sage_EmptyLatentImagePassthrough:
         latent = torch.zeros([batch_size, size, height // 8, width // 8], device=self.device)
         return ({"samples": latent}, width, height)
 
-class Sage_DualCLIPTextEncode:
+class Sage_DualCLIPTextEncode(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
         return {
