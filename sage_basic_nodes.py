@@ -95,7 +95,7 @@ class Sage_SetText:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "str": ("STRING", {"defaultInput": False, "multiline": True})
+                "str": ("STRING", {"defaultInput": False, "dynamicPrompts": True, "multiline": True})
             },
             "optional": {
                 "prefix": ("STRING", {"defaultInput": True, "multiline": True}),
@@ -226,7 +226,57 @@ class Sage_ConditioningZeroOut:
         output["pooled_output"] = torch.zeros_like(output.get("pooled_output", torch.tensor([])))
         conditioning = torch.zeros_like(output.pop("cond"))
         return [([conditioning, output],)]
+
+class Sage_ConditioningOneOut:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+            "clip": ("CLIP", {"defaultInput": True, "tooltip": "The CLIP model used for encoding."}),
+            }
+        }
     
+    RETURN_TYPES = ("CONDITIONING",)
+    FUNCTION = "one_out"
+
+    CATEGORY = "Sage Utils/clip"
+    DESCRIPTION = "Returns oned out conditioning."
+    
+    EXPERIMENTAL = True
+    
+    def zero_out(self, clip):
+        tokens = clip.tokenize("")
+        output = clip.encode_from_tokens(tokens, return_pooled=True, return_dict=True)
+        output["pooled_output"] = torch.ones_like(output.get("pooled_output", torch.tensor([])))
+        conditioning = torch.ones_like(output.pop("cond"))
+        return [([conditioning, output],)]
+    
+class Sage_ConditioningRngOut:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+            "clip": ("CLIP", {"defaultInput": True, "tooltip": "The CLIP model used for encoding."}),
+            "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "defaultInput": True, "tooltip": "The seed used to randomize the conditioning."})
+            }
+        }
+    
+    RETURN_TYPES = ("CONDITIONING",)
+    FUNCTION = "rng_out"
+
+    CATEGORY = "Sage Utils/clip"
+    DESCRIPTION = "Returns randomized conditioning."
+    
+    EXPERIMENTAL = True
+    
+    def rng_out(self, clip, seed):
+        torch.manual_seed(seed)
+        tokens = clip.tokenize("")
+        output = clip.encode_from_tokens(tokens, return_pooled=True, return_dict=True)
+        output["pooled_output"] = torch.rand_like(output.get("pooled_output", torch.tensor([])))
+        conditioning = torch.rand_like(output.pop("cond"))
+        return [([conditioning, output],)]  
+
 class Sage_EmptyLatentImagePassthrough:
     def __init__(self):
         self.device = comfy.model_management.intermediate_device()

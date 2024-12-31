@@ -44,6 +44,8 @@ NODE_CLASS_MAPPINGS = {
     # Clip nodes
     "Sage_DualCLIPTextEncode": Sage_DualCLIPTextEncode,
     "Sage_ConditioningZeroOut": Sage_ConditioningZeroOut,
+    #"Sage_ConditioningOneOut": Sage_ConditioningZeroOut,
+    "Sage_ConditioningRngOut": Sage_ConditioningRngOut,
     
     # Sampler nodes
     "Sage_KSampler": Sage_KSampler,
@@ -97,8 +99,10 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_LastLoraInfo": "Last Lora Info",
     
     # Clip nodes
-    "Sage_ConditioningZeroOut": "Zero Conditioning",
     "Sage_DualCLIPTextEncode": "Prompts to CLIP",
+    "Sage_ConditioningZeroOut": "Zero Conditioning",
+    #"Sage_ConditioningOneOut": "One Conditioning",
+    "Sage_ConditioningRngOut": "Randomized conditioning",
     
     # Sampler nodes
     "Sage_KSampler": "KSampler w/ Sampler Info",
