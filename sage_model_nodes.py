@@ -256,6 +256,7 @@ class Sage_ModelReport(ComfyNodeABC):
             if cur.get('model', {}).get('type', None) == "Checkpoint":
                 if baseModel not in sorted_models: sorted_models[baseModel] = []
                 sorted_models[baseModel].append(model_path)
+
             if cur.get('model', {}).get('type', None) == "LORA":
                 if baseModel not in sorted_loras: sorted_loras[baseModel] = []
                 sorted_loras[baseModel].append(model_path)

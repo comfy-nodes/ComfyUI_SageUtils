@@ -71,8 +71,8 @@ class Sage_LogicalSwitch(ComfyNodeABC):
         return {
             "required": {
                 "condition": ("BOOLEAN", {"defaultInput": False}),
-                "true_value": (AnyType("*"),{"defaultInput": False}),
-                "false_value": (AnyType("*"),{"defaultInput": False})
+                "true_value": (IO.ANY,{"defaultInput": False}),
+                "false_value": (IO.ANY,{"defaultInput": False})
             }
         }
     
@@ -80,7 +80,7 @@ class Sage_LogicalSwitch(ComfyNodeABC):
     def VALIDATE_INPUTS(s, input_types):
         return True
 
-    RETURN_TYPES = (AnyType("*"),)
+    RETURN_TYPES = (IO.ANY,)
     RETURN_NAMES = ("result",)
     
     FUNCTION = "if_else"
