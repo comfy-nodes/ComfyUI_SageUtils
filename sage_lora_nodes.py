@@ -96,11 +96,14 @@ class Sage_CollectKeywordsFromLoraStack(ComfyNodeABC):
             return ("",)
         
         for lora in lora_stack:
+            print(f"Let's get keywords for {lora[0]}")
             try:
-                hash = get_lora_hash(lora[0])
-
-                json = get_civitai_model_version_json(hash)
-                keywords = json["trainedWords"]
+                lora_path = folder_paths.get_full_path_or_raise("loras", lora[0])
+                if cache.cache_data.get(lora_path, {}).get("trainedWords", None) is None:
+                    pull_metadata(lora_path, True)
+                
+                keywords = cache.cache_data.get(lora_path, {}).get("trainedWords", [])
+                print(keywords)
                 if keywords != []:
                     lora_keywords.extend(keywords)
             except:
