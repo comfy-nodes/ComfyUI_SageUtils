@@ -3,6 +3,7 @@ import folder_paths
 import nodes
 import cli_args
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
+from server import get_comfyui_version
 
 from .sage import *
 
@@ -157,14 +158,14 @@ class Sage_ConstructMetadata(ComfyNodeABC):
                 lora_hash = cache.cache.data[lora_path]["hash"]
                 lora_hashes += [f"{lora_name}: {lora_hash}"]
         
-        lora_hash_string = "Lora hashes: " + ",".join(lora_hashes)
+        lora_hash_string = "Lora hashes: " + ", ".join(lora_hashes)
         civitai_string = f"Civitai resources: {json.dumps(resource_hashes)}"
 
-        metadata = f"{positive_string} {lora_to_prompt(lora_stack)}" + "\n" 
+        metadata = f"{positive_string}{lora_to_prompt(lora_stack)}" + "\n"
         if negative_string != "":
             metadata += f"Negative prompt: {negative_string}" + "\n"
-        metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height},"
-        metadata += f"Model: {name_from_path(model_info['path'])}, Model hash: {model_info['hash']}, Version: v1.10-RC-6-comfyui, {civitai_string}, {lora_hash_string}"
+        metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height}, "
+        metadata += f"Model: {name_from_path(model_info['path'])}, Model hash: {model_info['hash']}, Version: ComfyUI {get_comfyui_version()}, {civitai_string}, {lora_hash_string}"
         return metadata,
 
 
@@ -215,8 +216,8 @@ class Sage_ConstructMetadataLite(ComfyNodeABC):
 
         metadata = f"{positive_string}" + "\n" 
         if negative_string != "": metadata += f"Negative prompt: {negative_string}" + "\n"
-        metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height},"
-        metadata += f"Version: v1.10-RC-6-comfyui, Civitai resources: {json.dumps(resource_hashes)}"
+        metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height}, "
+        metadata += f"Version: ComfyUI {get_comfyui_version()}, Civitai resources: {json.dumps(resource_hashes)}"
         return metadata,
 
 # An altered version of Save Image
