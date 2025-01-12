@@ -331,6 +331,7 @@ class Sage_DualCLIPTextEncode(ComfyNodeABC):
         text = text or ""
 
         tokens = clip.tokenize(text)
+        #print(f"tokens = {tokens['g'].size()}")
         output = clip.encode_from_tokens(tokens, return_pooled=True, return_dict=True)
         cond = output.pop("cond")
         pbar.update(1)
