@@ -1,9 +1,9 @@
 import comfy
 import folder_paths
 import nodes
-import cli_args
+from comfy.cli_args import args
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
-from server import get_comfyui_version
+from comfyui_version import __version__
 
 from .sage import *
 
@@ -165,7 +165,7 @@ class Sage_ConstructMetadata(ComfyNodeABC):
         if negative_string != "":
             metadata += f"Negative prompt: {negative_string}" + "\n"
         metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height}, "
-        metadata += f"Model: {name_from_path(model_info['path'])}, Model hash: {model_info['hash']}, Version: ComfyUI {get_comfyui_version()}, {civitai_string}, {lora_hash_string}"
+        metadata += f"Model: {name_from_path(model_info['path'])}, Model hash: {model_info['hash']}, Version: ComfyUI {__version__}, {civitai_string}, {lora_hash_string}"
         return metadata,
 
 
@@ -203,6 +203,7 @@ class Sage_ConstructMetadataLite(ComfyNodeABC):
         
         sampler_name = civitai_sampler_name(sampler_info['sampler'], sampler_info['scheduler'])
         resource_hashes.append(get_model_info(model_info['path']))
+
         
         if lora_stack is not None:
             # We're going through generating A1111 style prompt information, but not doing the loras and model A1111 style, rather
@@ -217,7 +218,7 @@ class Sage_ConstructMetadataLite(ComfyNodeABC):
         metadata = f"{positive_string}" + "\n" 
         if negative_string != "": metadata += f"Negative prompt: {negative_string}" + "\n"
         metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height}, "
-        metadata += f"Version: ComfyUI {get_comfyui_version()}, Civitai resources: {json.dumps(resource_hashes)}"
+        metadata += f"Version: ComfyUI {__version__}, Civitai resources: {json.dumps(resource_hashes)}"
         return metadata,
 
 # An altered version of Save Image
@@ -256,7 +257,7 @@ class Sage_SaveImageWithMetadata(ComfyNodeABC):
 
     def set_metadata(self, include_node_metadata, include_extra_pnginfo_metadata, param_metadata = None, extra_metadata=None, prompt=None, extra_pnginfo=None):
         result = None
-        if not cli_args.args.disable_metadata:
+        if not args.disable_metadata:
             result = PngInfo()
             if param_metadata is not None:
                 result.add_text("parameters", param_metadata)
