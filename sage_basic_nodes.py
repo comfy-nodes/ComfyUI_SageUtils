@@ -1,4 +1,6 @@
 import torch
+import re
+
 import comfy
 import nodes
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
@@ -159,6 +161,34 @@ class Sage_TripleJoinText(ComfyNodeABC):
     
     def join_str(self, separator, str1, str2, str3):
         return (separator.join([str1, str2, str3]),)
+
+class Sage_CleanText(ComfyNodeABC):
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "str": ("STRING", {"defaultInput": True, "multiline": True}),
+            }
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("cleaned_string",)
+
+    FUNCTION = "clean_str"
+
+    CATEGORY = "Sage Utils/text"
+    DESCRIPTION = "Cleans up the string given."
+
+    def clean_str(self, str):
+        ret_list = [x for x in str.split(" ") if x.strip()]
+        ret = " ".join(ret_list)
+
+        ret_list = [x for x in ret.split(",") if x.strip()]
+        ret = ", ".join([x.strip(" ") for x in ret_list])
+
+        ret_list = [x for x in ret.split("\n") if x.strip()]
+        ret = "\n".join([x.strip(" ") for x in ret_list])
+        return (ret,)
 
 class Sage_ViewText(ComfyNodeABC):
     @classmethod

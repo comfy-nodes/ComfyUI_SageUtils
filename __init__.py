@@ -23,6 +23,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_SetText": Sage_SetText,
     "Sage_JoinText": Sage_JoinText,
     "Sage_TripleJoinText": Sage_TripleJoinText,
+    "Sage_CleanText": Sage_CleanText,
     "Sage_ViewText": Sage_ViewText,
     "Sage_PonyPrefix": Sage_PonyPrefix,
 
@@ -80,6 +81,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_SetText": "Set Text",
     "Sage_JoinText": "Join Text",
     "Sage_TripleJoinText": "Join Text x3",
+    "Sage_CleanText": "Clean Text",
     "Sage_ViewText": "View Text",
     "Sage_PonyPrefix": "Add Pony v6 Prefixes",
     
