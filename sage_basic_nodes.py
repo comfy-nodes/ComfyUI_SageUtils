@@ -5,7 +5,7 @@ import comfy
 import nodes
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
-from .sage_helpers import *
+from .sage import *
 
 class Sage_SetBool(ComfyNodeABC):
     @classmethod

@@ -8,8 +8,19 @@
 
 # Any files with "nodes" in the name are node definitions.
 
+import importlib
+import os
+import pathlib
+
+sage_sage_path = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).name
+
+sage_cache_path = sage_sage_path + ".sage_cache"
+sage_styles_path = sage_sage_path + ".sage_styles"
+
+cache = importlib.import_module(sage_cache_path)
+sage_styles = importlib.import_module(sage_styles_path)
+
 from .sage_helpers import *
-import ComfyUI_SageUtils.sage_cache as cache
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
 from .sage_metadata_nodes import *

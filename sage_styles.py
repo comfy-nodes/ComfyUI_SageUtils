@@ -1,15 +1,12 @@
+import os
 import json
 import pathlib
 
-sage_styles = {}
-style_path = pathlib.Path.cwd()
-style_user_path = pathlib.Path.cwd()
+cache_realpath = os.path.dirname(os.path.realpath(__file__))
 
-def init_styles(base_path):
-    global style_path, style_user_path
-    style_path = pathlib.Path(base_path) / "sage_styles.json"
-    style_user_path = pathlib.Path(base_path) / "sage_styles_user.json"
-    load_styles()
+sage_styles = {}
+style_path = pathlib.Path(cache_realpath) / "sage_styles.json"
+style_user_path = pathlib.Path(cache_realpath) / "sage_styles_user.json"
 
 def load_styles():
     global sage_styles

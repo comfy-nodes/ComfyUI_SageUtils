@@ -1,5 +1,4 @@
-from .sage_helpers import *
-import ComfyUI_SageUtils.sage_cache as cache
+from .sage import *
 
 import comfy
 import folder_paths
@@ -99,10 +98,10 @@ class Sage_CollectKeywordsFromLoraStack(ComfyNodeABC):
             print(f"Let's get keywords for {lora[0]}")
             try:
                 lora_path = folder_paths.get_full_path_or_raise("loras", lora[0])
-                if cache.cache_data.get(lora_path, {}).get("trainedWords", None) is None:
+                if cache.cache.data.get(lora_path, {}).get("trainedWords", None) is None:
                     pull_metadata(lora_path, True)
                 
-                keywords = cache.cache_data.get(lora_path, {}).get("trainedWords", [])
+                keywords = cache.cache.data.get(lora_path, {}).get("trainedWords", [])
                 print(keywords)
                 if keywords != []:
                     lora_keywords.extend(keywords)

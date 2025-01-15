@@ -1,7 +1,6 @@
 # File for any loader nodes. Separating out as the number is likely to grow.
 
-from .sage_helpers import *
-import ComfyUI_SageUtils.sage_cache as cache
+from .sage import *
 
 import torch
 import pathlib
@@ -45,7 +44,7 @@ class Sage_CheckpointLoaderRecent(ComfyNodeABC):
         model_info = { "path": folder_paths.get_full_path_or_raise("checkpoints", ckpt_name) }
         pull_metadata(model_info["path"], True)
 
-        model_info["hash"] = cache.cache_data[model_info["path"]]["hash"]
+        model_info["hash"] = cache.cache.data[model_info["path"]]["hash"]
     
         out = comfy.sd.load_checkpoint_guess_config(model_info["path"], output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
         result = (*out[:3], model_info)
@@ -77,7 +76,7 @@ class Sage_CheckpointLoaderSimple(ComfyNodeABC):
         model_info = { "path": folder_paths.get_full_path_or_raise("checkpoints", ckpt_name) }
         pull_metadata(model_info["path"], True)
 
-        model_info["hash"] = cache.cache_data[model_info["path"]]["hash"]
+        model_info["hash"] = cache.cache.data[model_info["path"]]["hash"]
     
         out = comfy.sd.load_checkpoint_guess_config(model_info["path"], output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
         result = (*out[:3], model_info)
@@ -110,7 +109,7 @@ class Sage_UNETLoader(ComfyNodeABC):
             "path": folder_paths.get_full_path_or_raise("diffusion_models", unet_name)
         }
         pull_metadata(model_info["path"], True)
-        model_info["hash"] = cache.cache_data[model_info["path"]]["hash"]
+        model_info["hash"] = cache.cache.data[model_info["path"]]["hash"]
 
         model = comfy.sd.load_diffusion_model(model_info["path"], model_options=model_options)
         return model, model_info
@@ -189,13 +188,13 @@ class Sage_CacheMaintenance(ComfyNodeABC):
     DESCRIPTION = "Lets you remove entries for models that are no longer there. dup_hash returns a list of files with the same hash, and dup_model returns ones with the same civitai model id (but not neccessarily the same version)."
 
     def cache_maintenance(self, remove_ghost_entries):
-        ghost_entries = [path for path in cache.cache_data if not pathlib.Path(path).is_file()]
+        ghost_entries = [path for path in cache.cache.data if not pathlib.Path(path).is_file()]
         cache_by_hash = {}
         cache_by_id = {}
         dup_hash = {}
         dup_id = {}
 
-        for model_path, data in cache.cache_data.items():
+        for model_path, data in cache.cache.data.items():
             if 'hash' in data:
                 cache_by_hash.setdefault(data['hash'], []).append(model_path)
             if 'modelId' in data:
@@ -203,8 +202,8 @@ class Sage_CacheMaintenance(ComfyNodeABC):
 
         if remove_ghost_entries:
             for ghost in ghost_entries:
-                cache.cache_data.pop(ghost)
-            cache.save_cache()
+                cache.cache.data.pop(ghost)
+            cache.cache.save()
 
         dup_hash = {h: paths for h, paths in cache_by_hash.items() if len(paths) > 1}
         dup_id = {i: paths for i, paths in cache_by_id.items() if len(paths) > 1}
@@ -250,8 +249,8 @@ class Sage_ModelReport(ComfyNodeABC):
         
         self.get_files(scan_models)
         
-        for model_path in cache.cache_data.keys():
-            cur = cache.cache_data.get(model_path, {})
+        for model_path in cache.cache.data.keys():
+            cur = cache.cache.data.get(model_path, {})
             baseModel = cur.get('baseModel', None)
             if cur.get('model', {}).get('type', None) == "Checkpoint":
                 if baseModel not in sorted_models: sorted_models[baseModel] = []

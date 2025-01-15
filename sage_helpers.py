@@ -14,7 +14,7 @@ import requests
 import folder_paths
 import comfy.utils
 
-import ComfyUI_SageUtils.sage_cache as cache
+from .sage import *
 
 def name_from_path(path):
     return pathlib.Path(path).name
@@ -63,20 +63,20 @@ def get_file_sha256(path):
     return result
 
 def pull_metadata(file_path, timestamp = False):
-    cache.load_cache()
+    cache.cache.load()
     
     print(f"Pull metadata for {file_path}.")
-    hash = cache.cache_data.get(file_path, {}).get("hash", "")
+    hash = cache.cache.data.get(file_path, {}).get("hash", "")
 
     if not hash:
-        cache.cache_data[file_path] = {"hash": get_file_sha256(file_path)}
-        hash = cache.cache_data[file_path]["hash"]
+        cache.cache.data[file_path] = {"hash": get_file_sha256(file_path)}
+        hash = cache.cache.data[file_path]["hash"]
     else:
         time.sleep(3)
     
     try:
         pull_json = True
-        file_cache = cache.cache_data.get(file_path, {})
+        file_cache = cache.cache.data.get(file_path, {})
         
         if 'lastUsed' in file_cache and 'civitai' in file_cache:
             last_used = datetime.datetime.fromisoformat(file_cache['lastUsed'])
@@ -108,8 +108,8 @@ def pull_metadata(file_path, timestamp = False):
     if timestamp:
         file_cache['lastUsed'] = datetime.datetime.now().isoformat()
 
-    cache.cache_data[file_path] = file_cache
-    cache.save_cache()
+    cache.cache.data[file_path] = file_cache
+    cache.cache.save()
 
 def lora_to_string(lora_name, model_weight, clip_weight):
     lora_string = ' <lora:' + str(pathlib.Path(lora_name).name) + ":" + str(model_weight) +  ">" #  + ":" + str(clip_weight)
@@ -141,17 +141,17 @@ def get_lora_hash(lora_name):
     lora_path = folder_paths.get_full_path_or_raise("loras", lora_name)
     pull_metadata(lora_path)
 
-    return cache.cache_data[lora_path]["hash"]
+    return cache.cache.data[lora_path]["hash"]
 
 def get_model_info(lora_path, weight = None):
     ret = {}
     try:
-        ret["type"] = cache.cache_data[lora_path]["model"]["type"]
+        ret["type"] = cache.cache.data[lora_path]["model"]["type"]
         if (ret["type"] == "LORA") and (weight is not None):
             ret["weight"] = weight
-        ret["modelVersionId"] = cache.cache_data[lora_path]["id"]
-        ret["modelName"] = cache.cache_data[lora_path]["model"]["name"]
-        ret["modelVersionName"] = cache.cache_data[lora_path]["name"]
+        ret["modelVersionId"] = cache.cache.data[lora_path]["id"]
+        ret["modelName"] = cache.cache.data[lora_path]["model"]["name"]
+        ret["modelVersionName"] = cache.cache.data[lora_path]["name"]
     except:
         ret = {}
     return ret
@@ -216,13 +216,13 @@ def get_recently_used_models(model_type):
         full_model_list = folder_paths.get_filename_list(model_type)
         for item in full_model_list:
             model_path = folder_paths.get_full_path_or_raise(model_type, item)
-            if model_path not in cache.cache_data.keys():
+            if model_path not in cache.cache.data.keys():
                 continue
             
-            if 'lastUsed' not in cache.cache_data[model_path]:
+            if 'lastUsed' not in cache.cache.data[model_path]:
                 continue
             
-            last = cache.cache_data[model_path]['lastUsed']
+            last = cache.cache.data[model_path]['lastUsed']
             last_used = datetime.datetime.fromisoformat(last)
             #print(f"{model_path} - last: {last} last_used: {last_used}")
             if (datetime.datetime.now() - last_used).days <= 7:

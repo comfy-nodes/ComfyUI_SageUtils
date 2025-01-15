@@ -4,8 +4,7 @@ import nodes
 import cli_args
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
-from .sage_helpers import *
-import ComfyUI_SageUtils.sage_cache as cache
+from .sage import *
 
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
@@ -155,7 +154,7 @@ class Sage_ConstructMetadata(ComfyNodeABC):
                 if lora_data != {}:
                     resource_hashes.append(lora_data)
                 
-                lora_hash = cache.cache_data[lora_path]["hash"]
+                lora_hash = cache.cache.data[lora_path]["hash"]
                 lora_hashes += [f"{lora_name}: {lora_hash}"]
         
         lora_hash_string = "Lora hashes: " + ",".join(lora_hashes)
