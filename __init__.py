@@ -1,11 +1,15 @@
+import os 
 import ComfyUI_SageUtils.sage_cache
 import ComfyUI_SageUtils.sage_helpers
 import ComfyUI_SageUtils.sage_styles
 
 from .sage import *
 
-sage_cache.load_cache()
-sage_styles.load_styles()
+base_sage_path = os.path.dirname(os.path.realpath(__file__))
+print(f"Base Sage Path: {base_sage_path}")
+
+sage_cache.init_cache(base_sage_path)
+sage_styles.init_styles(base_sage_path)
 WEB_DIRECTORY = "./js"
 
 # A dictionary that contains all nodes you want to export with their names

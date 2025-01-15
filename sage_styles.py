@@ -1,14 +1,19 @@
 import json
 import pathlib
-import folder_paths
 
 sage_styles = {}
-style_path = pathlib.Path(folder_paths.base_path) / "custom_nodes" / "ComfyUI_SageUtils" / "sage_styles.json"
-style_user_path = pathlib.Path(folder_paths.base_path) / "custom_nodes" / "ComfyUI_SageUtils" / "sage_styles_user.json"
+style_path = pathlib.Path.cwd()
+style_user_path = pathlib.Path.cwd()
 
+def init_styles(base_path):
+    global style_path, style_user_path
+    style_path = pathlib.Path(base_path) / "sage_styles.json"
+    style_user_path = pathlib.Path(base_path) / "sage_styles_user.json"
+    load_styles()
 
 def load_styles():
     global sage_styles
+    global style_path, style_user_path
     sage_styles = []
 
     for path in [style_path, style_user_path]:

@@ -1,10 +1,15 @@
 import json
 import pathlib
-import folder_paths
 
-cache_path = pathlib.Path(folder_paths.base_path) / "custom_nodes" / "ComfyUI_SageUtils" / "sage_cache.json"
+cache_path = pathlib.Path.cwd()
 cache_data = {}
 
+def init_cache(base_path):
+    global cache_path
+    cache_path = pathlib.Path(base_path) / "sage_cache.json"
+    cache_data = {}
+    load_cache()
+    
 def load_cache():
     global cache_data
     try:
