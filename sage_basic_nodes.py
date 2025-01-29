@@ -390,3 +390,25 @@ class Sage_DualCLIPTextEncode(ComfyNodeABC):
             pos or "",
             neg or ""
         )
+
+class Sage_CLIPSetLastLayer(ComfyNodeABC):
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "clip": ("CLIP",),
+                "stop_at_clip_layer": ("INT", {"default": -1, "min": -24, "max": -1, "step": 1},),
+            }
+        }
+
+    RETURN_TYPES = ("CLIP", "INT")
+    RETURN_NAMES = ("CLIP", "clip_skip")
+    FUNCTION = "set_last_layer"
+
+    CATEGORY = "Sage Utils/clip"
+
+    def set_last_layer(self, clip, stop_at_clip_layer, clip_skip=None):
+        clip = clip.clone()
+        clip.clip_layer(stop_at_clip_layer)
+        clip_skip = abs(stop_at_clip_layer)
+        return (clip, clip_skip)
