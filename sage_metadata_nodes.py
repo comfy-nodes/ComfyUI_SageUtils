@@ -167,7 +167,7 @@ class Sage_ConstructMetadata(ComfyNodeABC):
             metadata = f"{positive_string}\n"
         else:
             lora_hash_string = ', Lora hashes: "' + ", ".join(lora_hashes) + '"'
-            metadata = f"{positive_string} {lora_to_prompt(lora_stack)}\n"
+            metadata = f"{positive_string}{lora_to_prompt(lora_stack)}\n"
 
         if negative_string != "":
             metadata += f"Negative prompt: {negative_string}\n"
