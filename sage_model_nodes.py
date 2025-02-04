@@ -7,23 +7,23 @@ import pathlib
 import numpy as np
 import json
 from PIL import Image, ImageOps, ImageSequence
-from PIL.PngImagePlugin import PngInfo
 
 # Pieces of ComfyUI that are being brought in for one reason or another.
 import comfy
 import folder_paths
 import node_helpers
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
+from nodes import CheckpointLoaderSimple, UNETLoader
 
 
 class Sage_CheckpointLoaderRecent(ComfyNodeABC):
     def __init__(self):
         pass
-    
+
     @classmethod
     def INPUT_TYPES(s):
         ckpt_list = get_recently_used_models("checkpoints")
-            
+
         return {
             "required": {
                 "ckpt_name": (ckpt_list, {"tooltip": "The name of the checkpoint (model) to load."}),
@@ -31,8 +31,8 @@ class Sage_CheckpointLoaderRecent(ComfyNodeABC):
         }
     RETURN_TYPES = ("MODEL", "CLIP", "VAE", "MODEL_INFO")
     RETURN_NAMES = ("model", "clip", "vae", "model_info")
-    OUTPUT_TOOLTIPS = ("The model used for denoising latents.", 
-                    "The CLIP model used for encoding text prompts.", 
+    OUTPUT_TOOLTIPS = ("The model used for denoising latents.",
+                    "The CLIP model used for encoding text prompts.",
                     "The VAE model used for encoding and decoding images to and from latent space.",
                     "The model path and hash, all in one output.")
     FUNCTION = "load_checkpoint"
@@ -45,44 +45,41 @@ class Sage_CheckpointLoaderRecent(ComfyNodeABC):
         pull_metadata(model_info["path"], True)
 
         model_info["hash"] = cache.cache.data[model_info["path"]]["hash"]
-    
+
         out = comfy.sd.load_checkpoint_guess_config(model_info["path"], output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
         result = (*out[:3], model_info)
         return (result)
-    
-class Sage_CheckpointLoaderSimple(ComfyNodeABC):
+
+class Sage_CheckpointLoaderSimple(CheckpointLoaderSimple):
     def __init__(self):
-        pass
-    
+            pass
+
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
         return {
-            "required": {
-                "ckpt_name": (folder_paths.get_filename_list("checkpoints"), {"tooltip": "The name of the checkpoint (model) to load."}),
+                "required": {
+                    "ckpt_name": (folder_paths.get_filename_list("checkpoints"), {"tooltip": "The name of the checkpoint (model) to load."}),
+                }
             }
-        }
+
     RETURN_TYPES = ("MODEL", "CLIP", "VAE", "MODEL_INFO")
     RETURN_NAMES = ("model", "clip", "vae", "model_info")
-    OUTPUT_TOOLTIPS = ("The model used for denoising latents.", 
-                    "The CLIP model used for encoding text prompts.", 
+    OUTPUT_TOOLTIPS = ("The model used for denoising latents.",
+                    "The CLIP model used for encoding text prompts.",
                     "The VAE model used for encoding and decoding images to and from latent space.",
                     "The model path and hash, all in one output.")
     FUNCTION = "load_checkpoint"
-
     CATEGORY  =  "Sage Utils/model"
     DESCRIPTION = "Loads a diffusion model checkpoint. Also returns a model_info output to pass to the construct metadata node, and the hash. (And hashes and pulls civitai info for the file.)"
-
     def load_checkpoint(self, ckpt_name):
         model_info = { "path": folder_paths.get_full_path_or_raise("checkpoints", ckpt_name) }
         pull_metadata(model_info["path"], True)
 
         model_info["hash"] = cache.cache.data[model_info["path"]]["hash"]
-    
-        out = comfy.sd.load_checkpoint_guess_config(model_info["path"], output_vae=True, output_clip=True, embedding_directory=folder_paths.get_folder_paths("embeddings"))
-        result = (*out[:3], model_info)
-        return (result)
+        ret = super().load_checkpoint(ckpt_name) + (model_info,)
+        return ret
 
-class Sage_UNETLoader(ComfyNodeABC):
+class Sage_UNETLoader(UNETLoader):
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { "unet_name": (folder_paths.get_filename_list("diffusion_models"), ),
@@ -95,29 +92,19 @@ class Sage_UNETLoader(ComfyNodeABC):
     CATEGORY  =  "Sage Utils/model"
 
     def load_unet(self, unet_name, weight_dtype):
-        dtype_map = {
-            "fp8_e4m3fn": torch.float8_e4m3fn,
-            "fp8_e4m3fn_fast": torch.float8_e4m3fn,
-            "fp8_e5m2": torch.float8_e5m2
-        }
-        model_options = {"dtype": dtype_map.get(weight_dtype)}
-        if weight_dtype == "fp8_e4m3fn_fast":
-            model_options["fp8_optimizations"] = True
-
         model_info = {
             "name": pathlib.Path(unet_name).name,
             "path": folder_paths.get_full_path_or_raise("diffusion_models", unet_name)
         }
         pull_metadata(model_info["path"], True)
         model_info["hash"] = cache.cache.data[model_info["path"]]["hash"]
+        ret = super().load_unet(unet_name, weight_dtype) + (model_info,)
+        return ret
 
-        model = comfy.sd.load_diffusion_model(model_info["path"], model_options=model_options)
-        return model, model_info
-    
 class Sage_LoadImage(ComfyNodeABC):
     @classmethod
     def INPUT_TYPES(s):
-        files = sorted(str(x.relative_to(folder_paths.get_input_directory())) 
+        files = sorted(str(x.relative_to(folder_paths.get_input_directory()))
                         for x in pathlib.Path(folder_paths.get_input_directory()).rglob('*') if x.is_file())
         return {"required": {"image": (files, {"image_upload": True})}}
 
@@ -130,7 +117,7 @@ class Sage_LoadImage(ComfyNodeABC):
     def load_image(self, image):
         image_path = folder_paths.get_annotated_filepath(image)
         img = node_helpers.pillow(Image.open, image_path)
-        
+
         output_images, output_masks = [], []
         w, h = None, None
 
@@ -142,10 +129,10 @@ class Sage_LoadImage(ComfyNodeABC):
 
             if not output_images:
                 w, h = image.size
-            
+
             if image.size != (w, h):
                 continue
-            
+
             image = torch.from_numpy(np.array(image).astype(np.float32) / 255.0)[None,]
             mask = (1. - torch.from_numpy(np.array(i.getchannel('A')).astype(np.float32) / 255.0)).unsqueeze(0) if 'A' in i.getbands() else torch.zeros((1, 64, 64), dtype=torch.float32)
             output_images.append(image)
@@ -179,10 +166,10 @@ class Sage_CacheMaintenance(ComfyNodeABC):
                 "remove_ghost_entries": ("BOOLEAN", {"defaultInput": True})
             }
         }
-        
+
     RETURN_TYPES = ("STRING", "STRING", "STRING")
     RETURN_NAMES = ("ghost_entries", "dup_hash","dup_model")
-    
+
     FUNCTION = "cache_maintenance"
     CATEGORY = "Sage Utils/model"
     DESCRIPTION = "Lets you remove entries for models that are no longer there. dup_hash returns a list of files with the same hash, and dup_model returns ones with the same civitai model id (but not neccessarily the same version)."
@@ -218,10 +205,10 @@ class Sage_ModelReport(ComfyNodeABC):
                 "scan_models": (("none", "loras", "checkpoints", "all"), {"defaultInput": False, "default": "none"}),
             }
         }
-        
+
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("model_list", "lora_list")
-    
+
     FUNCTION = "pull_list"
     CATEGORY = "Sage Utils/model"
     DESCRIPTION = "Calculates the hash of models & checkpoints & pulls civitai info if chosen. Returns a list of models in the cache of the specified type, by base model type."
@@ -236,19 +223,19 @@ class Sage_ModelReport(ComfyNodeABC):
             the_lora_paths = folder_paths.get_folder_paths("loras")
             the_checkpoint_paths = folder_paths.get_folder_paths("checkpoints")
             the_paths = [*the_lora_paths, *the_checkpoint_paths]
-        
+
         print(f"Scanning {len(the_paths)} paths.")
         print(f"the_paths == {the_paths}")
         if the_paths != []: model_scan(the_paths)
-    
+
     def pull_list(self, scan_models):
         sorted_models = {}
         sorted_loras = {}
         model_list = ""
         lora_list = ""
-        
+
         self.get_files(scan_models)
-        
+
         for model_path in cache.cache.data.keys():
             cur = cache.cache.data.get(model_path, {})
             baseModel = cur.get('baseModel', None)
@@ -262,5 +249,5 @@ class Sage_ModelReport(ComfyNodeABC):
 
         if sorted_models != {}: model_list = json.dumps(sorted_models, separators=(",", ":"), sort_keys=True, indent=4)
         if sorted_loras != {}: lora_list = json.dumps(sorted_loras, separators=(",", ":"), sort_keys=True, indent=4)
-        
+
         return (model_list, lora_list)
