@@ -64,7 +64,8 @@ NODE_CLASS_MAPPINGS = {
     "Sage_ConstructMetadataLite": Sage_ConstructMetadataLite,
 
     # Utility nodes
-    "Sage_GetFileHash": Sage_GetFileHash
+    "Sage_GetFileHash": Sage_GetFileHash,
+    "Sage_RenormCFG": Sage_RenormCFG
 
 }
 
@@ -122,7 +123,8 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_ConstructMetadataLite": "Construct Metadata Lite",
 
     # Utility nodes
-    "Sage_GetFileHash": "Get Sha256 Hash"
+    "Sage_GetFileHash": "Get Sha256 Hash",
+    "Sage_RenormCFG": "Renormalize CFG"
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']
