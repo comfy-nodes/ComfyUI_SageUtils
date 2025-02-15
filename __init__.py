@@ -5,6 +5,12 @@ print(f"Base Sage Path: {base_sage_path}")
 
 from .sage import *
 
+from .nodes.metadata import *
+from .nodes.basic import *
+from .nodes.model import *
+from .nodes.util import *
+from .nodes.lora import *
+
 cache.cache.load()
 sage_styles.load_styles()
 WEB_DIRECTORY = "./js"

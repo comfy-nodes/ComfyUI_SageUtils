@@ -6,25 +6,16 @@
 
 # It also imports this file, which imports the others.
 
-# Any files with "nodes" in the name are node definitions.
+# Node definitions are in the nodes folder.
 
 import importlib
 import os
 import pathlib
 
-sage_sage_path = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).name
-
-sage_cache_path = sage_sage_path + ".utils.cache"
-sage_styles_path = sage_sage_path + ".utils.styles"
-
-cache = importlib.import_module(sage_cache_path)
-sage_styles = importlib.import_module(sage_styles_path)
+base_path = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).name
+cache = importlib.import_module(".utils.cache", package=base_path)
+sage_styles = importlib.import_module(".utils.styles", package=base_path)
 
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
 from .utils.helpers import *
-from .nodes.metadata import *
-from .nodes.basic import *
-from .nodes.model import *
-from .nodes.util import *
-from .nodes.lora import *
