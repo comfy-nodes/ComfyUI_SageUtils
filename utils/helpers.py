@@ -14,7 +14,7 @@ import requests
 import folder_paths
 import comfy.utils
 
-from .sage import *
+from ..sage import *
 
 def name_from_path(path):
     return pathlib.Path(path).name

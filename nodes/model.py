@@ -1,6 +1,6 @@
 # File for any loader nodes. Separating out as the number is likely to grow.
 
-from .sage import *
+from ..sage import *
 
 import torch
 import pathlib

@@ -3,7 +3,7 @@
 import json
 import torch
 
-from .sage import *
+from ..sage import *
 import folder_paths
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 

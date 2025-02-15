@@ -14,17 +14,17 @@ import pathlib
 
 sage_sage_path = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).name
 
-sage_cache_path = sage_sage_path + ".sage_cache"
-sage_styles_path = sage_sage_path + ".sage_styles"
+sage_cache_path = sage_sage_path + ".utils.cache"
+sage_styles_path = sage_sage_path + ".utils.styles"
 
 cache = importlib.import_module(sage_cache_path)
 sage_styles = importlib.import_module(sage_styles_path)
 
-from .sage_helpers import *
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
-from .sage_metadata_nodes import *
-from .sage_basic_nodes import *
-from .sage_model_nodes import *
-from .sage_util_nodes import *
-from .sage_lora_nodes import *
+from .utils.helpers import *
+from .nodes.metadata import *
+from .nodes.basic import *
+from .nodes.model import *
+from .nodes.util import *
+from .nodes.lora import *

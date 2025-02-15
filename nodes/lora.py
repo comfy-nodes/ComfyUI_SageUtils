@@ -1,4 +1,4 @@
-from .sage import *
+from ..sage import *
 
 import comfy
 import folder_paths

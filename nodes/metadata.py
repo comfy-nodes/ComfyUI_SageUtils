@@ -4,7 +4,7 @@ import nodes
 import cli_args
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
-from .sage import *
+from ..sage import *
 
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
