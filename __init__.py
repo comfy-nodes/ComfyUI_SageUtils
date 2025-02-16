@@ -74,7 +74,8 @@ NODE_CLASS_MAPPINGS = {
     # Utility nodes
     "Sage_GetFileHash": Sage_GetFileHash,
     "Sage_RenormCFG": Sage_RenormCFG,
-    "Sage_CLIPTextEncodeLumina2": Sage_CLIPTextEncodeLumina2
+    "Sage_CLIPTextEncodeLumina2": Sage_CLIPTextEncodeLumina2,
+    "Sage_DualCLIPTextEncodeLumina2": Sage_DualCLIPTextEncodeLumina2
 
 }
 
@@ -134,7 +135,8 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     # Utility nodes
     "Sage_GetFileHash": "Get Sha256 Hash",
     "Sage_RenormCFG": "Renormalize CFG for Lumina 2",
-    "Sage_CLIPTextEncodeLumina2": "CLIP Text Encode for Lumina 2"
+    "Sage_CLIPTextEncodeLumina2": "CLIP Text Encode for Lumina 2",
+    "Sage_DualCLIPTextEncodeLumina2": "Prompts to CLIP for Lumina 2"
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']
