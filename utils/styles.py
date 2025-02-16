@@ -2,11 +2,11 @@ import os
 import json
 import pathlib
 
-cache_realpath = os.path.dirname(os.path.realpath(__file__))
+from ..sage import base_path
 
 sage_styles = {}
-style_path = pathlib.Path(cache_realpath) / "sage_styles.json"
-style_user_path = pathlib.Path(cache_realpath) / "sage_styles_user.json"
+style_path = pathlib.Path(base_path) / "sage_styles.json"
+style_user_path = pathlib.Path(base_path) / "sage_styles_user.json"
 
 def load_styles():
     global sage_styles

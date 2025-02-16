@@ -2,11 +2,11 @@ import os
 import json
 import pathlib
 
-cache_realpath = os.path.dirname(os.path.realpath(__file__))
+from ..sage import base_path
 
 class SageCache:
-    def __init__(self, base_path):
-        self.path = pathlib.Path(base_path) / "sage_cache.json"
+    def __init__(self, path):
+        self.path = pathlib.Path(path) / "sage_cache.json"
         self.data = {}
 
     def load(self):
@@ -27,4 +27,4 @@ class SageCache:
         except Exception as e:
             print(f"Unable to save cache: {e}")
 
-cache = SageCache(cache_realpath)
+cache = SageCache(base_path)

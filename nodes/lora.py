@@ -1,3 +1,6 @@
+# Lora nodes
+# This includes nodes involving loras and lora stacks.
+
 from ..sage import *
 
 import comfy

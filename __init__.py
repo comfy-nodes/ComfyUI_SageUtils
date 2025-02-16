@@ -1,15 +1,17 @@
 import os
 
-base_sage_path = os.path.dirname(os.path.realpath(__file__))
-print(f"Base Sage Path: {base_sage_path}")
-
 from .sage import *
 
-from .nodes.metadata import *
 from .nodes.basic import *
-from .nodes.model import *
-from .nodes.util import *
+from .nodes.conditioning import *
+from .nodes.image import *
 from .nodes.lora import *
+from .nodes.lumina2 import *
+from .nodes.metadata import *
+from .nodes.model import *
+from .nodes.sampler import *
+from .nodes.text import *
+from .nodes.util import *
 
 cache.cache.load()
 sage_styles.load_styles()
@@ -71,7 +73,8 @@ NODE_CLASS_MAPPINGS = {
 
     # Utility nodes
     "Sage_GetFileHash": Sage_GetFileHash,
-    "Sage_RenormCFG": Sage_RenormCFG
+    "Sage_RenormCFG": Sage_RenormCFG,
+    "Sage_CLIPTextEncodeLumina2": Sage_CLIPTextEncodeLumina2
 
 }
 
@@ -130,7 +133,8 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
 
     # Utility nodes
     "Sage_GetFileHash": "Get Sha256 Hash",
-    "Sage_RenormCFG": "Renormalize CFG"
+    "Sage_RenormCFG": "Renormalize CFG for Lumina 2",
+    "Sage_CLIPTextEncodeLumina2": "CLIP Text Encode for Lumina 2"
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']

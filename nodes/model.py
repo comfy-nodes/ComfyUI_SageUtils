@@ -1,20 +1,15 @@
-# File for any loader nodes. Separating out as the number is likely to grow.
+# Model nodes.
+# This contains nodes involving models. Primarily loading models, but also includes nodes for model info and cache maintenance.
 
 from ..sage import *
 
-import torch
 import pathlib
-import numpy as np
 import json
-from PIL import Image, ImageOps, ImageSequence
 
-# Pieces of ComfyUI that are being brought in for one reason or another.
 import comfy
 import folder_paths
-import node_helpers
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 from nodes import CheckpointLoaderSimple, UNETLoader
-
 
 class Sage_CheckpointLoaderRecent(ComfyNodeABC):
     def __init__(self):
@@ -100,63 +95,6 @@ class Sage_UNETLoader(UNETLoader):
         model_info["hash"] = cache.cache.data[model_info["path"]]["hash"]
         ret = super().load_unet(unet_name, weight_dtype) + (model_info,)
         return ret
-
-class Sage_LoadImage(ComfyNodeABC):
-    @classmethod
-    def INPUT_TYPES(s):
-        files = sorted(str(x.relative_to(folder_paths.get_input_directory()))
-                        for x in pathlib.Path(folder_paths.get_input_directory()).rglob('*') if x.is_file())
-        return {"required": {"image": (files, {"image_upload": True})}}
-
-    CATEGORY = "Sage Utils/image"
-
-    RETURN_TYPES = ("IMAGE", "MASK", "INT", "INT", "STRING")
-    RETURN_NAMES = ("image", "mask", "width", "height", "metadata")
-
-    FUNCTION = "load_image"
-    def load_image(self, image):
-        image_path = folder_paths.get_annotated_filepath(image)
-        img = node_helpers.pillow(Image.open, image_path)
-
-        output_images, output_masks = [], []
-        w, h = None, None
-
-        for i in ImageSequence.Iterator(img):
-            i = node_helpers.pillow(ImageOps.exif_transpose, i)
-            if i.mode == 'I':
-                i = i.point(lambda x: x * (1 / 255))
-            image = i.convert("RGB")
-
-            if not output_images:
-                w, h = image.size
-
-            if image.size != (w, h):
-                continue
-
-            image = torch.from_numpy(np.array(image).astype(np.float32) / 255.0)[None,]
-            mask = (1. - torch.from_numpy(np.array(i.getchannel('A')).astype(np.float32) / 255.0)).unsqueeze(0) if 'A' in i.getbands() else torch.zeros((1, 64, 64), dtype=torch.float32)
-            output_images.append(image)
-            output_masks.append(mask)
-
-        output_image = torch.cat(output_images, dim=0) if len(output_images) > 1 and img.format != 'MPO' else output_images[0]
-        output_mask = torch.cat(output_masks, dim=0) if len(output_masks) > 1 and img.format != 'MPO' else output_masks[0]
-
-        return output_image, output_mask, w, h, f"{img.info}"
-
-    @classmethod
-    def IS_CHANGED(s, image):
-        image_path = folder_paths.get_annotated_filepath(image)
-        m = hashlib.sha256()
-        with open(image_path, 'rb') as f:
-            m.update(f.read())
-        return m.digest().hex()
-
-    @classmethod
-    def VALIDATE_INPUTS(s, image):
-        if not folder_paths.exists_annotated_filepath(image):
-            return "Invalid image file: {}".format(image)
-
-        return True
 
 class Sage_CacheMaintenance(ComfyNodeABC):
     @classmethod

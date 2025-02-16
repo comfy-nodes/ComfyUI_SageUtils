@@ -9,7 +9,6 @@ import numpy as np
 import torch
 import json
 from PIL import Image, ImageOps
-import requests
 
 import folder_paths
 import comfy.utils
