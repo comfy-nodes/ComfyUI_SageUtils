@@ -12,9 +12,9 @@ import importlib
 import os
 import pathlib
 
-base_path = pathlib.Path(os.path.dirname(os.path.realpath(__file__))).name
-cache = importlib.import_module(".utils.cache", package=base_path)
-sage_styles = importlib.import_module(".utils.styles", package=base_path)
+base_path = pathlib.Path(os.path.dirname(os.path.realpath(__file__)))
+cache = importlib.import_module(".utils.cache", package=base_path.name)
+sage_styles = importlib.import_module(".utils.styles", package=base_path.name)
 
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
