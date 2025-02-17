@@ -56,6 +56,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_ConditioningZeroOut": Sage_ConditioningZeroOut,
     #"Sage_ConditioningOneOut": Sage_ConditioningZeroOut,
     "Sage_ConditioningRngOut": Sage_ConditioningRngOut,
+    "Sage_CLIPSetLastLayer": Sage_CLIPSetLastLayer,
 
     # Sampler nodes
     "Sage_KSampler": Sage_KSampler,
@@ -115,6 +116,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_ConditioningZeroOut": "Zero Conditioning",
     #"Sage_ConditioningOneOut": "One Conditioning",
     "Sage_ConditioningRngOut": "Randomized conditioning",
+    "Sage_CLIPSetLastLayer": "CLIP Set Last Layer",
 
     # Sampler nodes
     "Sage_KSampler": "KSampler w/ Sampler Info",

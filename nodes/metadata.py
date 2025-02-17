@@ -24,6 +24,7 @@ class Sage_ConstructMetadata(ComfyNodeABC):
                 "sampler_info": ('SAMPLER_INFO', { "defaultInput": True}),
                 "width": ('INT', { "defaultInput": True}),
                 "height": ('INT', { "defaultInput": True}),
+                "clip_skip": ('INT', {"default": 1, "min": 1, "max": 24, "step": 1, "defaultInput": True}),
                 "civitai_format": ('BOOLEAN',{"defaultInput": False, "default": False})
             },
             "optional": {
@@ -38,7 +39,7 @@ class Sage_ConstructMetadata(ComfyNodeABC):
     CATEGORY = "Sage Utils/metadata"
     DESCRIPTION = "Puts together metadata in a A1111-like format. Uses the custom sampler info node. The return value is a string, so can be manipulated by other nodes."
     
-    def construct_metadata(self, model_info, positive_string, negative_string, width, height, sampler_info, civitai_format, lora_stack = None):
+    def construct_metadata(self, model_info, positive_string, negative_string, width, height, clip_skip, sampler_info, civitai_format, lora_stack = None):
         metadata = ''
 
         lora_hashes = []
@@ -73,7 +74,9 @@ class Sage_ConstructMetadata(ComfyNodeABC):
 
         if negative_string != "":
             metadata += f"Negative prompt: {negative_string}\n"
-        metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height}, "
+
+        clip_skip = "" if clip_skip <= 1 else f"Clip skip: {clip_skip}, "
+        metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height}, {clip_skip}"
         metadata += f"Model: {name_from_path(model_info['path'])}, Model hash: {model_info['hash']}, Version: ComfyUI {__version__}" + civitai_resources + lora_hash_string
         return metadata,
 

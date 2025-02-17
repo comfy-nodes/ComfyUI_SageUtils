@@ -5,6 +5,7 @@ import torch
 
 import comfy
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
+from nodes import CLIPSetLastLayer
 
 from ..sage import *
 
@@ -226,4 +227,24 @@ class Sage_CLIPTextEncodeLumina2(ComfyNodeABC):
         prompt = f'{system_prompt} <Prompt Start> {user_prompt}'
         tokens = clip.tokenize(prompt)
         return (clip.encode_from_tokens_scheduled(tokens), )
-    
+
+class Sage_CLIPSetLastLayer(CLIPSetLastLayer):
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "clip": ("CLIP",),
+                "stop_at_clip_layer": ("INT", {"default": -1, "min": -24, "max": -1, "step": 1},),
+            }
+        }
+
+    RETURN_TYPES = ("CLIP", "INT")
+    RETURN_NAMES = ("CLIP", "clip_skip")
+    FUNCTION = "set_last_layer"
+
+    CATEGORY = "Sage Utils/clip"
+
+    def set_last_layer(self, clip, stop_at_clip_layer):
+        clip_skip = abs(stop_at_clip_layer)
+        ret = super().set_last_layer(clip, stop_at_clip_layer) + (clip_skip,)
+        return ret
