@@ -6,6 +6,7 @@ import os
 
 import folder_paths
 from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
+from comfyui_version import __version__
 
 from ..sage import *
 
@@ -69,7 +70,7 @@ class Sage_ConstructMetadata(ComfyNodeABC):
         if negative_string != "":
             metadata += f"Negative prompt: {negative_string}" + "\n"
         metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height},"
-        metadata += f"Model: {name_from_path(model_info['path'])}, Model hash: {model_info['hash']}, Version: v1.10-RC-6-comfyui, {civitai_string}, {lora_hash_string}"
+        metadata += f"Model: {name_from_path(model_info['path'])}, Model hash: {model_info['hash']}, Version: ComfyUI {__version__}, {civitai_string}, {lora_hash_string}"
         return metadata,
 
 class Sage_ConstructMetadataLite(ComfyNodeABC):
@@ -120,5 +121,5 @@ class Sage_ConstructMetadataLite(ComfyNodeABC):
         metadata = f"{positive_string}" + "\n" 
         if negative_string != "": metadata += f"Negative prompt: {negative_string}" + "\n"
         metadata += f"Steps: {sampler_info['steps']}, Sampler: {sampler_name}, Scheduler type: {sampler_info['scheduler']}, CFG scale: {sampler_info['cfg']}, Seed: {sampler_info['seed']}, Size: {width}x{height},"
-        metadata += f"Version: v1.10-RC-6-comfyui, Civitai resources: {json.dumps(resource_hashes)}"
+        metadata += f"Version: ComfyUI {__version__}, Civitai resources: {json.dumps(resource_hashes)}"
         return metadata,
