@@ -111,7 +111,7 @@ def pull_metadata(file_path, timestamp = False):
     cache.cache.save()
 
 def lora_to_string(lora_name, model_weight, clip_weight):
-    lora_string = ' <lora:' + str(pathlib.Path(lora_name).name) + ":" + str(model_weight) +  ">" #  + ":" + str(clip_weight)
+    lora_string = ' <lora:' + os.path.splitext(str(pathlib.Path(lora_name).name))[0] + ":" + str(model_weight) +  ">" #  + ":" + str(clip_weight)
         
     return lora_string
 
