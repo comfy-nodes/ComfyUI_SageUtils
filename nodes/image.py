@@ -118,8 +118,10 @@ class Sage_SaveImageWithMetadata(ComfyNodeABC):
                 "include_workflow_metadata": ("BOOLEAN", {"default": True, "defaultInput": False})
             },
             "optional": {
-                "param_metadata": ("STRING",{ "defaultInput": True}),
-                "extra_param_metadata": ("STRING",{ "defaultInput": False})
+                "param_metadata": ("STRING", {"defaultInput": True}),
+                "extra_param_metadata": ("STRING", {}),
+                "include_workflow_metadata": ("BOOLEAN", {"default": True}),
+                "save_workflow_json": ("BOOLEAN", {"default": False})
             },
             "hidden": {
                 "prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"
@@ -153,7 +155,7 @@ class Sage_SaveImageWithMetadata(ComfyNodeABC):
         return result
         
 
-    def save_images(self, images, filename_prefix, include_workflow_metadata, param_metadata = None, extra_param_metadata=None, prompt=None, extra_pnginfo=None):
+    def save_images(self, images, filename_prefix, param_metadata = None, extra_param_metadata=None, include_workflow_metadata=True, save_workflow_json=False, prompt=None, extra_pnginfo=None):
         filename_prefix = self.format_filename(filename_prefix) + self.prefix_append
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
         results = list()
@@ -163,9 +165,18 @@ class Sage_SaveImageWithMetadata(ComfyNodeABC):
             final_metadata = self.set_metadata(include_workflow_metadata, param_metadata, extra_param_metadata, prompt, extra_pnginfo)
 
             filename_with_batch_num = filename.replace("%batch_num%", str(batch_number))
-            file = f"{filename_with_batch_num}_{counter:05}_.png"
+            filename_base = f"{filename_with_batch_num}_{counter:05}_"
+            file = f"{filename_base}.png"
             
             img.save(os.path.join(full_output_folder, file), pnginfo=final_metadata, compress_level=self.compress_level)
+
+            if save_workflow_json and extra_pnginfo is not None:
+                file_path_workflow = os.path.join(
+                    full_output_folder, f"{filename_base}.json"
+                )
+                with open(file_path_workflow, "w", encoding="utf-8") as f:
+                    json.dump(extra_pnginfo["workflow"], f)
+
             results.append({
                 "filename": file,
                 "subfolder": subfolder,
