@@ -3,6 +3,8 @@
 
 import torch
 import numpy as np
+import re
+import datetime
 from PIL import Image, ImageOps, ImageSequence
 from PIL.PngImagePlugin import PngInfo
 
@@ -133,7 +135,9 @@ class Sage_SaveImageWithMetadata(ComfyNodeABC):
     CATEGORY = "Sage Utils/image"
     DESCRIPTION = "Saves the input images to your ComfyUI output directory with added metadata. The param_metadata input should come from Construct Metadata, and the extra_metadata is anything you want. Both are just strings, though, with the difference being that the first has a keyword of parameters, and the second, extra, so technically you could pass in your own metadata, or even type it in in a Set Text node and hook that to this node."
 
-    def set_metadata(self, include_node_metadata, include_extra_pnginfo_metadata, param_metadata = None, extra_metadata=None, prompt=None, extra_pnginfo=None):
+    pattern_format = re.compile(r"(%[^%]+%)")
+
+    def set_metadata(self, include_node_metadata, include_extra_pnginfo_metadata, param_metadata=None, extra_metadata=None, prompt=None, extra_pnginfo=None):
         result = None
         if not cli_args.args.disable_metadata:
             result = PngInfo()
@@ -152,7 +156,7 @@ class Sage_SaveImageWithMetadata(ComfyNodeABC):
         
 
     def save_images(self, images, filename_prefix, include_node_metadata, include_extra_pnginfo_metadata, param_metadata = None, extra_metadata=None, prompt=None, extra_pnginfo=None):
-        filename_prefix += self.prefix_append
+        filename_prefix = self.format_filename(filename_prefix) + self.prefix_append
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
         results = list()
         for (batch_number, image) in enumerate(images):
@@ -172,3 +176,28 @@ class Sage_SaveImageWithMetadata(ComfyNodeABC):
             counter += 1
 
         return { "ui": { "images": results } }
+
+
+    @classmethod
+    def format_filename(cls, filename):
+        result = re.findall(cls.pattern_format, filename)
+        
+        now = datetime.datetime.now()
+        date_table = {
+            "yyyy": str(now.year),
+            "yy": str(now.year)[-2:],
+            "MM": str(now.month).zfill(2),
+            "dd": str(now.day).zfill(2),
+            "hh": str(now.hour).zfill(2),
+            "mm": str(now.minute).zfill(2),
+            "ss": str(now.second).zfill(2),
+        }
+        for segment in result:
+            parts = segment.replace("%", "").split(":")
+            key = parts[0]
+            if key == "date":
+                date_format = parts[1] if len(parts) >= 2 else "yyyyMMddhhmmss"
+                for k, v in date_table.items():
+                    date_format = date_format.replace(k, v)
+                filename = filename.replace(segment, date_format)
+        return filename
