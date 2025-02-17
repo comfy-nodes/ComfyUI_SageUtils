@@ -120,7 +120,7 @@ class Sage_SaveImageWithMetadata(ComfyNodeABC):
             },
             "optional": {
                 "param_metadata": ("STRING",{ "defaultInput": True}),
-                "extra_metadata": ("STRING",{ "defaultInput": True})
+                "extra_param_metadata": ("STRING",{ "defaultInput": False})
             },
             "hidden": {
                 "prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"
@@ -133,15 +133,17 @@ class Sage_SaveImageWithMetadata(ComfyNodeABC):
     OUTPUT_NODE = True
 
     CATEGORY = "Sage Utils/image"
-    DESCRIPTION = "Saves the input images to your ComfyUI output directory with added metadata. The param_metadata input should come from Construct Metadata, and the extra_metadata is anything you want. Both are just strings, though, with the difference being that the first has a keyword of parameters, and the second, extra, so technically you could pass in your own metadata, or even type it in in a Set Text node and hook that to this node."
+    DESCRIPTION = "Saves the input images to your ComfyUI output directory with added metadata. The param_metadata input should come from Construct Metadata, and the extra_param_metadata is anything you want. Both are just strings, though, with the difference being that the first has a keyword of parameters, and the second, extra, so technically you could pass in your own metadata, or even type it in in a Set Text node and hook that to this node."
 
     pattern_format = re.compile(r"(%[^%]+%)")
 
-    def set_metadata(self, include_node_metadata, include_extra_pnginfo_metadata, param_metadata=None, extra_metadata=None, prompt=None, extra_pnginfo=None):
+    def set_metadata(self, include_node_metadata, include_extra_pnginfo_metadata, param_metadata=None, extra_param_metadata=None, prompt=None, extra_pnginfo=None):
         result = None
         if not cli_args.args.disable_metadata:
             result = PngInfo()
             if param_metadata is not None:
+                if extra_param_metadata is not None:
+                    param_metadata += (f", {extra_param_metadata}")
                 result.add_text("parameters", param_metadata)
             if include_node_metadata == True:
                 if prompt is not None:
@@ -150,19 +152,17 @@ class Sage_SaveImageWithMetadata(ComfyNodeABC):
                 if extra_pnginfo is not None:
                     for x in extra_pnginfo:
                         result.add_text(x, json.dumps(extra_pnginfo[x]))
-            if extra_metadata is not None:
-                result.add_text("Extra", extra_metadata)
         return result
         
 
-    def save_images(self, images, filename_prefix, include_node_metadata, include_extra_pnginfo_metadata, param_metadata = None, extra_metadata=None, prompt=None, extra_pnginfo=None):
+    def save_images(self, images, filename_prefix, include_node_metadata, include_extra_pnginfo_metadata, param_metadata = None, extra_param_metadata=None, prompt=None, extra_pnginfo=None):
         filename_prefix = self.format_filename(filename_prefix) + self.prefix_append
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
         results = list()
         for (batch_number, image) in enumerate(images):
             i = 255. * image.cpu().numpy()
             img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
-            final_metadata = self.set_metadata(include_node_metadata, include_extra_pnginfo_metadata, param_metadata, extra_metadata, prompt, extra_pnginfo)
+            final_metadata = self.set_metadata(include_node_metadata, include_extra_pnginfo_metadata, param_metadata, extra_param_metadata, prompt, extra_pnginfo)
 
             filename_with_batch_num = filename.replace("%batch_num%", str(batch_number))
             file = f"{filename_with_batch_num}_{counter:05}_.png"
