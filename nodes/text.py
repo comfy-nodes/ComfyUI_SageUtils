@@ -127,7 +127,7 @@ class Sage_PonyPrefix(ComfyNodeABC):
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "add_score": ("BOOLEAN", {"defaultInput": False}),
+                "score": (["none", "best", "good", "normal", "all"], {"defaultInput": False},),
                 "rating": (["none", "safe", "questionable", "explicit"], {"defaultInput": False}),
                 "source": (["none", "pony", "furry", "anime", "cartoon", "3d", "western", "comic", "monster"], {"defaultInput": False}),
             },
@@ -141,9 +141,17 @@ class Sage_PonyPrefix(ComfyNodeABC):
     FUNCTION = "create_prefix"
     CATEGORY = "Sage Utils/text"
 
-    def create_prefix(self, add_score, rating, source, prompt=None):
-        prefix = "score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, " if add_score else ""
-        prefix += f"source_{source}, " if source != "none" else ""
+    def create_prefix(self, score, rating, source, prompt=None):
+        if score == "best":
+            add_score = "score_9"
+        elif score == "good":
+            add_score = "score_9, score_8_up, score_7_up"
+        elif score == "normal":
+            add_score = "score_9, score_8_up, score_7_up, score_6_up, score_5_up"
+        elif score == "all":
+            add_score = "score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up"
+        prefix = f"{add_score}, " if score != "none" else ""
         prefix += f"rating_{rating}, " if rating != "none" else ""
+        prefix += f"source_{source}, " if source != "none" else ""
         prefix += f"{prompt or ''}"
         return (prefix,)
