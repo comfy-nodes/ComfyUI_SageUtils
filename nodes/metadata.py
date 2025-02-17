@@ -19,16 +19,16 @@ class Sage_ConstructMetadata(ComfyNodeABC):
         return {
             "required": { 
                 "model_info": ('MODEL_INFO',{ "defaultInput": True}),
-                "positive_string": ('STRING',{ "defaultInput": True}),
-                "negative_string": ('STRING',{ "defaultInput": True}),
                 "sampler_info": ('SAMPLER_INFO', { "defaultInput": True}),
                 "width": ('INT', { "defaultInput": True}),
                 "height": ('INT', { "defaultInput": True}),
-                "clip_skip": ('INT', {"default": 1, "min": 1, "max": 24, "step": 1, "defaultInput": True}),
-                "civitai_format": ('BOOLEAN',{"defaultInput": False, "default": False})
+                "positive_string": ('STRING', {"multiline": True, "defaultInput": True}),
             },
             "optional": {
-                "lora_stack": ('LORA_STACK',{ "defaultInput": True})
+                "negative_string": ('STRING', {"multiline": True, "defaultInput": True}),
+                "clip_skip": ('INT', {"default": 1, "min": 1, "max": 24, "step": 1, "defaultInput": True}),
+                "lora_stack": ('LORA_STACK', {"defaultInput": True}),
+                "civitai_format": ('BOOLEAN', {"defaultInput": False, "default": False}),
             },
         }
 
@@ -39,7 +39,7 @@ class Sage_ConstructMetadata(ComfyNodeABC):
     CATEGORY = "Sage Utils/metadata"
     DESCRIPTION = "Puts together metadata in a A1111-like format. Uses the custom sampler info node. The return value is a string, so can be manipulated by other nodes."
     
-    def construct_metadata(self, model_info, positive_string, negative_string, width, height, clip_skip, sampler_info, civitai_format, lora_stack = None):
+    def construct_metadata(self, model_info, sampler_info, width, height, positive_string, negative_string="", civitai_format=False, clip_skip=1, lora_stack=None):
         metadata = ''
 
         lora_hashes = []
