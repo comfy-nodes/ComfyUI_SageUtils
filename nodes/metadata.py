@@ -66,10 +66,12 @@ class Sage_ConstructMetadata(ComfyNodeABC):
                 lora_hashes += [f"{lora_name}: {lora_hash}"]
         
         if civitai_format:
-            civitai_resources = f", Civitai resources: {json.dumps(resource_hashes)}"
+            if len(resource_hashes) >=1:
+                civitai_resources = f", Civitai resources: {json.dumps(resource_hashes)}"
             metadata = f"{positive_string}\n"
         else:
-            lora_hash_string = ', Lora hashes: "' + ", ".join(lora_hashes) + '"'
+            if len(lora_hashes) >= 1:
+                lora_hash_string = ', Lora hashes: "' + ", ".join(lora_hashes) + '"'
             metadata = f"{positive_string}{lora_to_prompt(lora_stack)}\n"
 
         if negative_string != "":
