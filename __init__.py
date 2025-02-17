@@ -6,7 +6,6 @@ from .nodes.basic import *
 from .nodes.conditioning import *
 from .nodes.image import *
 from .nodes.lora import *
-from .nodes.lumina2 import *
 from .nodes.metadata import *
 from .nodes.model import *
 from .nodes.sampler import *
@@ -53,6 +52,7 @@ NODE_CLASS_MAPPINGS = {
 
     # Clip nodes
     "Sage_DualCLIPTextEncode": Sage_DualCLIPTextEncode,
+    "Sage_DualCLIPTextEncodeLumina2": Sage_DualCLIPTextEncodeLumina2,
     "Sage_ConditioningZeroOut": Sage_ConditioningZeroOut,
     #"Sage_ConditioningOneOut": Sage_ConditioningZeroOut,
     "Sage_ConditioningRngOut": Sage_ConditioningRngOut,
@@ -72,10 +72,7 @@ NODE_CLASS_MAPPINGS = {
     "Sage_ConstructMetadataLite": Sage_ConstructMetadataLite,
 
     # Utility nodes
-    "Sage_GetFileHash": Sage_GetFileHash,
-    "Sage_RenormCFG": Sage_RenormCFG,
-    "Sage_CLIPTextEncodeLumina2": Sage_CLIPTextEncodeLumina2,
-    "Sage_DualCLIPTextEncodeLumina2": Sage_DualCLIPTextEncodeLumina2
+    "Sage_GetFileHash": Sage_GetFileHash
 
 }
 
@@ -114,6 +111,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
 
     # Clip nodes
     "Sage_DualCLIPTextEncode": "Prompts to CLIP",
+    "Sage_DualCLIPTextEncodeLumina2": "Prompts to CLIP for Lumina 2",
     "Sage_ConditioningZeroOut": "Zero Conditioning",
     #"Sage_ConditioningOneOut": "One Conditioning",
     "Sage_ConditioningRngOut": "Randomized conditioning",
@@ -133,10 +131,7 @@ NODE_DISPLAY_NAME_MAPPINGS  = {
     "Sage_ConstructMetadataLite": "Construct Metadata Lite",
 
     # Utility nodes
-    "Sage_GetFileHash": "Get Sha256 Hash",
-    "Sage_RenormCFG": "Renormalize CFG for Lumina 2",
-    "Sage_CLIPTextEncodeLumina2": "CLIP Text Encode for Lumina 2",
-    "Sage_DualCLIPTextEncodeLumina2": "Prompts to CLIP for Lumina 2"
+    "Sage_GetFileHash": "Get Sha256 Hash"
 }
 
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']
