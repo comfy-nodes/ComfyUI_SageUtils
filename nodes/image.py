@@ -114,8 +114,7 @@ class Sage_SaveImageWithMetadata(ComfyNodeABC):
         return {
             "required": {
                 "images": ("IMAGE", {"tooltip": "The images to save."}),
-                "filename_prefix": ("STRING", {"default": "ComfyUI_Meta", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or %Empty Latent Image.width% to include values from nodes."}),
-                "include_workflow_metadata": ("BOOLEAN", {"default": True, "defaultInput": False})
+                "filename_prefix": ("STRING", {"default": "ComfyUI_Meta", "tooltip": "The prefix for the file to save. This may include formatting information such as %date:yyyy-MM-dd% or %Empty Latent Image.width% to include values from nodes."})
             },
             "optional": {
                 "param_metadata": ("STRING", {"defaultInput": True}),
