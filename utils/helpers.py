@@ -70,8 +70,8 @@ def pull_metadata(file_path, timestamp = False):
     if not hash:
         cache.cache.data[file_path] = {"hash": get_file_sha256(file_path)}
         hash = cache.cache.data[file_path]["hash"]
-    else:
-        time.sleep(3)
+    # else:
+    #     time.sleep(3)
     
     try:
         pull_json = True
