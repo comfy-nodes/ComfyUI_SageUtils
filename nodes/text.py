@@ -33,7 +33,7 @@ class Sage_JoinText(ComfyNodeABC):
     def INPUT_TYPES(s):
         return {
             "required": {
-                "separator": ("STRING", {"defaultInput": False, "default": ', '}),
+                "separator": ("STRING", {"defaultInput": False, "multiline": True}),
                 "str1": ("STRING", {"defaultInput": True, "multiline": True}),
                 "str2": ("STRING", {"defaultInput": True, "multiline": True}),
             }
@@ -48,6 +48,8 @@ class Sage_JoinText(ComfyNodeABC):
     DESCRIPTION = "Joins two strings with a separator."
     
     def join_str(self, separator, str1, str2):
+        if not str1 or not str2:
+            separator = ""
         return (separator.join([str1, str2]),)
 
 class Sage_TripleJoinText(ComfyNodeABC):
